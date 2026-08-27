@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
       if (schoolId === 'global') {
         filter.$or = [{ school: null }, { school: { $exists: false } }];
       } else {
-        filter.$or = [{ school: schoolId }, { school: null }, { school: { $exists: false } }];
+        filter.school = schoolId;
       }
     }
     if (classId) filter.class = classId;

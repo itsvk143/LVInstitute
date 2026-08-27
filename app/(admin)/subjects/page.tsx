@@ -470,15 +470,10 @@ export default function SubjectsPage() {
     }
   }
 
-  // Filter available classes to ONLY those relevant to the selected school/scope
+  // Filter available classes to ONLY those that have subjects in the current view/scope
   const visibleClassesForScope = classes.filter((c) => {
     const count = classSubjectCountMap.get(c._id) || 0;
-    if (selectedSchoolId !== "all") {
-      // For a specific school (like NEET), ONLY show classes with active subjects
-      return count > 0 || selectedClassFilter === c._id;
-    }
-    // For All Schools, show classes that have subjects or high school grades
-    return count > 0 || (c.grade !== undefined && c.grade >= 10) || selectedClassFilter === c._id;
+    return count > 0 || selectedClassFilter === c._id;
   });
 
   const displayedClasses = visibleClassesForScope.length > 0 ? visibleClassesForScope : classes;
