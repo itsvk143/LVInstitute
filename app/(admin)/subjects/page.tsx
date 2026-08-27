@@ -470,11 +470,18 @@ export default function SubjectsPage() {
     }
   }
 
-  if (Object.keys(subjectsByClass).length === 0 && classes.length > 0) {
-    for (const c of classes.slice(0, 3)) {
-      subjectsByClass[c._id] = { classInfo: c, subjects: [] };
+  // Filter available classes to ONLY those relevant to the selected school/scope
+  const visibleClassesForScope = classes.filter((c) => {
+    const count = classSubjectCountMap.get(c._id) || 0;
+    if (selectedSchoolId !== "all") {
+      // For a specific school (like NEET), ONLY show classes with active subjects
+      return count > 0 || selectedClassFilter === c._id;
     }
-  }
+    // For All Schools, show classes that have subjects or high school grades
+    return count > 0 || (c.grade !== undefined && c.grade >= 10) || selectedClassFilter === c._id;
+  });
+
+  const displayedClasses = visibleClassesForScope.length > 0 ? visibleClassesForScope : classes;
 
   const activeSchoolObj = schools.find((s) => String(s._id) === String(selectedSchoolId));
   const activeClassObj = classes.find((c) => String(c._id) === String(selectedClassFilter));
@@ -542,6 +549,7 @@ export default function SubjectsPage() {
                   setShowSchoolModal(true);
                 } else {
                   setSelectedSchoolId(e.target.value);
+                  setSelectedClassFilter(""); // Reset class filter to prevent stale 0-count view
                 }
               }}
               className="w-full py-2.5 px-3.5 rounded-xl glass-input text-xs text-white font-medium cursor-pointer"
@@ -575,9 +583,9 @@ export default function SubjectsPage() {
               className="w-full py-2.5 px-3.5 rounded-xl glass-input text-xs text-white font-medium cursor-pointer"
             >
               <option value="" className="bg-slate-900">
-                🎓 All Active Classes ({subjects.length} Subjects Total)
+                🎓 All Classes in this Program ({subjects.length} Subjects Total)
               </option>
-              {classes.map((c) => {
+              {displayedClasses.map((c) => {
                 const count = classSubjectCountMap.get(c._id) || 0;
                 return (
                   <option key={c._id} value={c._id} className="bg-slate-900">
@@ -635,7 +643,7 @@ export default function SubjectsPage() {
               All Classes ({subjects.length})
             </button>
 
-            {classes.map((c) => {
+            {displayedClasses.map((c) => {
               const count = classSubjectCountMap.get(c._id) || 0;
               const isSelected = selectedClassFilter === c._id;
               return (
