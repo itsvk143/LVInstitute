@@ -7,7 +7,8 @@ import { ChapterProgress } from '@/lib/models/ChapterProgress';
 import { requireAdmin } from '@/lib/auth';
 import { School } from '@/lib/models/School';
 import { Teacher } from '@/lib/models/Teacher';
-import '@/lib/models/Lookup';
+import { Country } from '@/lib/models/Lookup';
+import { validateAndFormatPhone } from '@/lib/phone';
 import { z } from 'zod';
 
 const studentSchema = z.object({
@@ -114,6 +115,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: 'Validation failed', errors: parsed.error.issues }, { status: 400 });
     }
 
+    const countryDoc = await Country.findById(parsed.data.country).lean();
+    const countryCode = (countryDoc as { code?: string })?.code || 'IN';
+
+    // Validate parent phone strictly according to country code
+    const parentPhoneCheck = validateAndFormatPhone(parsed.data.parentContact, countryCode);
+    if (!parentPhoneCheck.isValid) {
+      return NextResponse.json({ success: false, message: `Parent Phone: ${parentPhoneCheck.error}` }, { status: 400 });
+    }
+    parsed.data.parentContact = parentPhoneCheck.formatted;
+
+    // Validate student mobile strictly if provided
+    if (parsed.data.phone && parsed.data.phone.trim()) {
+      const studentPhoneCheck = validateAndFormatPhone(parsed.data.phone, countryCode);
+      if (!studentPhoneCheck.isValid) {
+        return NextResponse.json({ success: false, message: `Student Mobile: ${studentPhoneCheck.error}` }, { status: 400 });
+      }
+      parsed.data.phone = studentPhoneCheck.formatted;
+    }
+
     const existing = await Student.findOne({ admissionNumber: parsed.data.admissionNumber });
     if (existing) {
       return NextResponse.json({ success: false, message: 'Admission number already exists' }, { status: 409 });
@@ -150,8 +170,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, message: 'Student created successfully', data: populated }, { status: 201 });
   } catch (error: unknown) {
+    console.error('Student POST error:', error);
     const err = error as Error;
     if (err.message === 'Unauthorized') return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
-    return NextResponse.json({ success: false, message: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ success: false, message: err.message || 'Failed to create student' }, { status: 500 });
   }
 }
