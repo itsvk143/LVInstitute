@@ -5,10 +5,12 @@ declare global {
   var mongoose: { conn: typeof import('mongoose') | null; promise: Promise<typeof import('mongoose')> | null };
 }
 
-const MONGODB_URI = process.env.MONGODB_URI!;
-
-if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable in .env.local');
+function getMongoUri(): string {
+  let uri = (process.env.MONGODB_URI || '').trim();
+  if (uri.startsWith('mmongodb')) {
+    uri = uri.replace(/^mmongodb/, 'mongodb');
+  }
+  return uri;
 }
 
 let cached = global.mongoose;
@@ -18,6 +20,11 @@ if (!cached) {
 }
 
 async function connectDB() {
+  const uri = getMongoUri();
+  if (!uri) {
+    throw new Error('Please define the MONGODB_URI environment variable in .env.local or Vercel Environment Variables');
+  }
+
   if (cached.conn) {
     return cached.conn;
   }
@@ -26,13 +33,13 @@ async function connectDB() {
     const opts = {
       bufferCommands: false,
       maxPoolSize: 10,
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 8000,
       socketTimeoutMS: 45000,
       connectTimeoutMS: 10000,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      return mongoose;
+    cached.promise = mongoose.connect(uri, opts).then((m) => {
+      return m;
     });
   }
 
@@ -40,6 +47,7 @@ async function connectDB() {
     cached.conn = await cached.promise;
   } catch (e) {
     cached.promise = null;
+    console.error('MongoDB connection failure:', e);
     throw e;
   }
 
