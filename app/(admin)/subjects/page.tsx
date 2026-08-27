@@ -24,6 +24,7 @@ import {
   CheckCircle2,
   ListPlus,
   X,
+  Wand2,
 } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
@@ -72,6 +73,290 @@ interface BulkChapterRow {
   estimatedHours: number;
 }
 
+// ── Built-in Standard Syllabus Presets for 1-Click Addition ───────────────────
+const CHAPTER_PRESETS: Record<string, { title: string; chapters: string[] }> = {
+  "Class 10 Mathematics": {
+    title: "Class 10 Mathematics (14 Ch)",
+    chapters: [
+      "Real Numbers",
+      "Polynomials",
+      "Pair of Linear Equations in Two Variables",
+      "Quadratic Equations",
+      "Arithmetic Progressions",
+      "Triangles",
+      "Coordinate Geometry",
+      "Introduction to Trigonometry",
+      "Some Applications of Trigonometry",
+      "Circles",
+      "Areas Related to Circles",
+      "Surface Areas and Volumes",
+      "Statistics",
+      "Probability",
+    ],
+  },
+  "Class 10 Science": {
+    title: "Class 10 Science (13 Ch)",
+    chapters: [
+      "Chemical Reactions and Equations",
+      "Acids, Bases and Salts",
+      "Metals and Non-Metals",
+      "Carbon and its Compounds",
+      "Life Processes",
+      "Control and Coordination",
+      "How do Organisms Reproduce?",
+      "Heredity and Evolution",
+      "Light – Reflection and Refraction",
+      "The Human Eye and the Colourful World",
+      "Electricity",
+      "Magnetic Effects of Electric Current",
+      "Our Environment",
+    ],
+  },
+  "Class 10 English": {
+    title: "Class 10 English (24 Ch)",
+    chapters: [
+      "A Letter to God",
+      "Dust of Snow & Fire and Ice",
+      "Nelson Mandela: Long Walk to Freedom",
+      "A Tiger in the Zoo",
+      "Two Stories about Flying",
+      "How to Tell Wild Animals & The Ball Poem",
+      "From the Diary of Anne Frank",
+      "Amanda!",
+      "Glimpses of India",
+      "The Trees & Fog",
+      "Mijbil the Otter",
+      "Madam Rides the Bus",
+      "The Tale of Custard the Dragon",
+      "The Sermon at Benares",
+      "The Proposal",
+      "A Triumph of Surgery",
+      "The Thief Story",
+      "The Midnight Visitor",
+      "A Question of Trust",
+      "Footprints without Feet",
+      "The Making of a Scientist",
+      "The Necklace",
+      "Bholi",
+      "The Book that Saved the Earth",
+    ],
+  },
+  "Class 10 Social Science": {
+    title: "Class 10 SST (21 Ch)",
+    chapters: [
+      "The Rise of Nationalism in Europe",
+      "Nationalism in India",
+      "The Making of a Global World",
+      "The Age of Industrialisation",
+      "Print Culture and the Modern World",
+      "Resources and Development",
+      "Forest and Wildlife Resources",
+      "Water Resources",
+      "Agriculture",
+      "Minerals and Energy Resources",
+      "Manufacturing Industries",
+      "Life Lines of National Economy",
+      "Power Sharing",
+      "Federalism",
+      "Gender, Religion and Caste",
+      "Political Parties",
+      "Outcomes of Democracy",
+      "Development",
+      "Sectors of the Indian Economy",
+      "Money and Credit",
+      "Globalisation and the Indian Economy",
+    ],
+  },
+  "Class 11 Mathematics": {
+    title: "Class 11 Maths (14 Ch)",
+    chapters: [
+      "Sets",
+      "Relations and Functions",
+      "Trigonometric Functions",
+      "Complex Numbers and Quadratic Equations",
+      "Linear Inequalities",
+      "Permutations and Combinations",
+      "Binomial Theorem",
+      "Sequences and Series",
+      "Straight Lines",
+      "Conic Sections",
+      "Introduction to Three Dimensional Geometry",
+      "Limits and Derivatives",
+      "Statistics",
+      "Probability",
+    ],
+  },
+  "Class 11 Physics": {
+    title: "Class 11 Physics (14 Ch)",
+    chapters: [
+      "Units and Measurements",
+      "Motion in a Straight Line",
+      "Motion in a Plane",
+      "Laws of Motion",
+      "Work, Energy and Power",
+      "System of Particles and Rotational Motion",
+      "Gravitation",
+      "Mechanical Properties of Solids",
+      "Mechanical Properties of Fluids",
+      "Thermal Properties of Matter",
+      "Thermodynamics",
+      "Kinetic Theory of Gases",
+      "Oscillations",
+      "Waves",
+    ],
+  },
+  "Class 11 Chemistry": {
+    title: "Class 11 Chemistry (9 Ch)",
+    chapters: [
+      "Some Basic Concepts of Chemistry",
+      "Structure of Atom",
+      "Classification of Elements and Periodicity in Properties",
+      "Chemical Bonding and Molecular Structure",
+      "Chemical Thermodynamics",
+      "Equilibrium",
+      "Redox Reactions",
+      "Organic Chemistry – Some Basic Principles and Techniques",
+      "Hydrocarbons",
+    ],
+  },
+  "Class 11 Biology": {
+    title: "Class 11 Biology (19 Ch)",
+    chapters: [
+      "The Living World",
+      "Biological Classification",
+      "Plant Kingdom",
+      "Animal Kingdom",
+      "Morphology of Flowering Plants",
+      "Anatomy of Flowering Plants",
+      "Structural Organisation in Animals",
+      "Cell: The Unit of Life",
+      "Biomolecules",
+      "Cell Cycle and Cell Division",
+      "Photosynthesis in Higher Plants",
+      "Respiration in Plants",
+      "Plant Growth and Development",
+      "Breathing and Exchange of Gases",
+      "Body Fluids and Circulation",
+      "Excretory Products and their Elimination",
+      "Locomotion and Movement",
+      "Neural Control and Coordination",
+      "Chemical Coordination and Integration",
+    ],
+  },
+  "Class 12 Mathematics": {
+    title: "Class 12 Maths (13 Ch)",
+    chapters: [
+      "Relations and Functions",
+      "Inverse Trigonometric Functions",
+      "Matrices",
+      "Determinants",
+      "Continuity and Differentiability",
+      "Application of Derivatives",
+      "Integrals",
+      "Application of Integrals",
+      "Differential Equations",
+      "Vector Algebra",
+      "Three Dimensional Geometry",
+      "Linear Programming",
+      "Probability",
+    ],
+  },
+  "Class 12 Physics": {
+    title: "Class 12 Physics (14 Ch)",
+    chapters: [
+      "Electric Charges and Fields",
+      "Electrostatic Potential and Capacitance",
+      "Current Electricity",
+      "Moving Charges and Magnetism",
+      "Magnetism and Matter",
+      "Electromagnetic Induction",
+      "Alternating Current",
+      "Electromagnetic Waves",
+      "Ray Optics and Optical Instruments",
+      "Wave Optics",
+      "Dual Nature of Radiation and Matter",
+      "Atoms",
+      "Nuclei",
+      "Semiconductor Electronics: Materials, Devices and Simple Circuits",
+    ],
+  },
+  "Class 12 Chemistry": {
+    title: "Class 12 Chemistry (10 Ch)",
+    chapters: [
+      "Solutions",
+      "Electrochemistry",
+      "Chemical Kinetics",
+      "The d- and f-Block Elements",
+      "Coordination Compounds",
+      "Haloalkanes and Haloarenes",
+      "Alcohols, Phenols and Ethers",
+      "Aldehydes, Ketones and Carboxylic Acids",
+      "Amines",
+      "Biomolecules",
+    ],
+  },
+  "Class 12 Biology": {
+    title: "Class 12 Biology (13 Ch)",
+    chapters: [
+      "Sexual Reproduction in Flowering Plants",
+      "Human Reproduction",
+      "Reproductive Health",
+      "Principles of Inheritance and Variation",
+      "Molecular Basis of Inheritance",
+      "Evolution",
+      "Human Health and Disease",
+      "Microbes in Human Welfare",
+      "Biotechnology: Principles and Processes",
+      "Biotechnology and its Applications",
+      "Organisms and Populations",
+      "Ecosystem",
+      "Biodiversity and Conservation",
+    ],
+  },
+  "NEET Botany": {
+    title: "NEET Botany (19 Ch)",
+    chapters: [
+      "The Living World",
+      "Biological Classification",
+      "Plant Kingdom",
+      "Morphology of Flowering Plants",
+      "Anatomy of Flowering Plants",
+      "Cell: The Unit of Life",
+      "Cell Cycle and Cell Division",
+      "Photosynthesis in Higher Plants",
+      "Respiration in Plants",
+      "Plant Growth and Development",
+      "Sexual Reproduction in Flowering Plants",
+      "Principles of Inheritance and Variation",
+      "Molecular Basis of Inheritance",
+      "Microbes in Human Welfare",
+      "Biotechnology: Principles and Processes",
+      "Biotechnology and its Applications in Agriculture",
+      "Organisms and Populations",
+      "Ecosystem",
+      "Biodiversity and Conservation",
+    ],
+  },
+  "NEET Zoology": {
+    title: "NEET Zoology (13 Ch)",
+    chapters: [
+      "Animal Kingdom",
+      "Structural Organisation in Animals",
+      "Biomolecules",
+      "Breathing and Exchange of Gases",
+      "Body Fluids and Circulation",
+      "Excretory Products and their Elimination",
+      "Locomotion and Movement",
+      "Neural Control and Coordination",
+      "Chemical Coordination and Integration",
+      "Human Reproduction",
+      "Reproductive Health",
+      "Evolution",
+      "Human Health and Disease",
+    ],
+  },
+};
+
 export default function SubjectsPage() {
   const queryClient = useQueryClient();
 
@@ -91,6 +376,13 @@ export default function SubjectsPage() {
     city: "",
     state: "",
     country: "India",
+  });
+
+  // ── 1-Click Standard Syllabus Modal State ──────────────────────────────────
+  const [showStandardModal, setShowStandardModal] = useState(false);
+  const [standardForm, setStandardForm] = useState({
+    templateKey: "all", // 'class10' | 'class11' | 'class12' | 'all'
+    schoolId: "global",
   });
 
   // ── Subject Creation / Edit Modal State ────────────────────────────────────
@@ -205,7 +497,7 @@ export default function SubjectsPage() {
         .replace(/^[\-\•\*\–\—\>]\s*/, "")
         .trim();
 
-      if (!cleaned) cleaned = line; // fallback if regex stripped everything
+      if (!cleaned) cleaned = line;
 
       return {
         name: cleaned,
@@ -215,6 +507,22 @@ export default function SubjectsPage() {
       };
     });
   };
+
+  // ── 1-Click Standard Template Mutation ─────────────────────────────────────
+  const applyStandardTemplate = useMutation({
+    mutationFn: async () => {
+      return axios.post("/api/subjects/standard-template", standardForm);
+    },
+    onSuccess: (res) => {
+      toast.success(res.data.message || "Standard syllabus applied successfully!");
+      setShowStandardModal(false);
+      queryClient.invalidateQueries({ queryKey: ["subjects"] });
+    },
+    onError: (err: unknown) => {
+      const error = err as { response?: { data?: { message?: string } } };
+      toast.error(error.response?.data?.message || "Failed to apply standard template");
+    },
+  });
 
   // ── School Mutation ───────────────────────────────────────────────────────
   const createSchool = useMutation({
@@ -263,7 +571,6 @@ export default function SubjectsPage() {
       toast.success(editingSubject ? "Subject updated successfully!" : "New subject & syllabus created!");
       setShowSubjectModal(false);
       
-      // Auto-switch to created subject's class and expand it
       if (subjectForm.class) {
         setSelectedClassFilter(subjectForm.class);
       }
@@ -399,7 +706,17 @@ export default function SubjectsPage() {
   // Open Bulk Add Chapters Modal
   const handleOpenBulkAddChapters = (sub: SubjectItem) => {
     setBulkActiveSubject(sub);
-    setBulkPasteText("");
+    
+    // Auto-detect matching preset if any
+    const matchedPreset = Object.entries(CHAPTER_PRESETS).find(([key]) =>
+      sub.name.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(sub.name.toLowerCase())
+    );
+
+    if (matchedPreset && (!sub.chapters || sub.chapters.length === 0)) {
+      setBulkPasteText(matchedPreset[1].chapters.join("\n"));
+    } else {
+      setBulkPasteText("");
+    }
     setShowBulkChapterModal(true);
   };
 
@@ -506,12 +823,28 @@ export default function SubjectsPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 flex-wrap">
+          {/* ⚡ 1-Click Standard Syllabus Shortcut */}
+          <button
+            onClick={() => {
+              setStandardForm({
+                templateKey: "all",
+                schoolId: selectedSchoolId !== "all" ? selectedSchoolId : "global",
+              });
+              setShowStandardModal(true);
+            }}
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-3.5 py-2.5 text-xs font-bold shadow-lg shadow-orange-500/20 transition-all cursor-pointer hover:scale-105"
+            title="1-Click Standard Class 10, 11, 12 Setup"
+          >
+            <Zap className="w-4 h-4 fill-white" />
+            <span>⚡ 1-Click Standard Syllabus</span>
+          </button>
+
           <button
             onClick={() => setShowSchoolModal(true)}
             className="inline-flex items-center gap-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 px-3.5 py-2.5 text-xs font-bold text-slate-200 transition-all cursor-pointer shadow-md"
           >
-            <Plus className="w-4 h-4 text-cyan-400" /> Add School & Location
+            <Plus className="w-4 h-4 text-cyan-400" /> Add School
           </button>
 
           <button
@@ -544,7 +877,7 @@ export default function SubjectsPage() {
                   setShowSchoolModal(true);
                 } else {
                   setSelectedSchoolId(e.target.value);
-                  setSelectedClassFilter(""); // Reset class filter to prevent stale 0-count view
+                  setSelectedClassFilter("");
                 }
               }}
               className="w-full py-2.5 px-3.5 rounded-xl glass-input text-xs text-white font-medium cursor-pointer"
@@ -689,14 +1022,28 @@ export default function SubjectsPage() {
                 : "No subjects found for this selection"}
             </p>
             <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-              Click below to add a subject (e.g. English, Mathematics, Physics) to this class.
+              Click below to apply standard CBSE/NCERT curriculum or add a custom subject.
             </p>
-            <button
-              onClick={() => handleOpenAddSubject(selectedClassFilter)}
-              className="mt-5 inline-flex items-center gap-2 rounded-xl btn-gradient px-4 py-2 text-xs font-bold text-white shadow-lg cursor-pointer"
-            >
-              <Plus className="w-4 h-4" /> Add Subject to {selectedClassFilter ? activeClassObj?.name || "Class" : "Curriculum"}
-            </button>
+            <div className="mt-5 flex items-center justify-center gap-3">
+              <button
+                onClick={() => {
+                  setStandardForm({
+                    templateKey: "all",
+                    schoolId: selectedSchoolId !== "all" ? selectedSchoolId : "global",
+                  });
+                  setShowStandardModal(true);
+                }}
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-2 text-xs font-bold text-white shadow-lg cursor-pointer"
+              >
+                <Zap className="w-4 h-4 fill-white" /> 1-Click Standard Syllabus
+              </button>
+              <button
+                onClick={() => handleOpenAddSubject(selectedClassFilter)}
+                className="inline-flex items-center gap-2 rounded-xl btn-gradient px-4 py-2 text-xs font-bold text-white shadow-lg cursor-pointer"
+              >
+                <Plus className="w-4 h-4" /> Add Subject
+              </button>
+            </div>
           </div>
         ) : (
           Object.values(subjectsByClass).map(({ classInfo, subjects: classSubjects }) => {
@@ -1000,6 +1347,124 @@ export default function SubjectsPage() {
         )}
       </div>
 
+      {/* ── MODAL: ⚡ 1-CLICK STANDARD SYLLABUS SETUP ───────────────────────── */}
+      {showStandardModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 overflow-y-auto">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="w-full max-w-xl rounded-3xl glass-panel p-6 sm:p-8 shadow-2xl border border-white/15 my-8 space-y-5"
+          >
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                  <Zap className="w-6 h-6 fill-amber-400" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-extrabold text-white" style={{ fontFamily: "Outfit, sans-serif" }}>
+                    1-Click Standard Syllabus Setup
+                  </h3>
+                  <p className="text-xs text-slate-300 mt-0.5">
+                    Instantly load verified standard CBSE/NCERT curriculum with all chapters
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowStandardModal(false)}
+                className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-slate-200 block mb-2">
+                  1. Select Syllabus Package to Apply *
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {[
+                    { key: "all", title: "Complete High School (Class 10, 11, 12)", desc: "14 Subjects • 212 Chapters total", badge: "Most Popular" },
+                    { key: "class10", title: "Class 10 Standard", desc: "Maths, Science, English, SST • 72 Chapters" },
+                    { key: "class11", title: "Class 11 Standard", desc: "Maths, Physics, Chem, Bio, Eng • 71 Chapters" },
+                    { key: "class12", title: "Class 12 Standard", desc: "Maths, Physics, Chem, Bio, Eng • 69 Chapters" },
+                  ].map((pkg) => (
+                    <div
+                      key={pkg.key}
+                      onClick={() => setStandardForm({ ...standardForm, templateKey: pkg.key })}
+                      className={cn(
+                        "p-3.5 rounded-2xl border transition-all cursor-pointer relative",
+                        standardForm.templateKey === pkg.key
+                          ? "bg-amber-500/15 border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.25)]"
+                          : "bg-white/5 border-white/10 hover:bg-white/10"
+                      )}
+                    >
+                      {pkg.badge && (
+                        <span className="absolute top-2 right-2 text-[9px] font-bold bg-amber-500 text-black px-1.5 py-0.2 rounded-full uppercase">
+                          {pkg.badge}
+                        </span>
+                      )}
+                      <p className="text-xs font-bold text-white">{pkg.title}</p>
+                      <p className="text-[11px] text-slate-400 mt-1">{pkg.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-200 block mb-1.5">
+                  2. Apply to Target School Scope *
+                </label>
+                <select
+                  value={standardForm.schoolId}
+                  onChange={(e) => setStandardForm({ ...standardForm, schoolId: e.target.value })}
+                  className="w-full rounded-xl glass-input px-3.5 py-2.5 text-xs text-white cursor-pointer"
+                >
+                  <option value="global" className="bg-slate-900">
+                    🌐 General / Shared Tuition Syllabus (All Schools)
+                  </option>
+                  {schools.map((s) => (
+                    <option key={s._id} value={s._id} className="bg-slate-900">
+                      🏫 Specific to {s.name} {s.city ? `(${s.city})` : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-200 flex items-start gap-2.5">
+                <Sparkles className="w-4 h-4 text-indigo-400 flex-shrink-0 mt-0.5" />
+                <p>
+                  This will safely verify all subjects and chapters in your database. Any missing subjects or chapters will be added with complete NCERT sequence numbers and default hours.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
+              <button
+                type="button"
+                onClick={() => setShowStandardModal(false)}
+                className="rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2.5 text-xs font-semibold text-slate-300 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={() => applyStandardTemplate.mutate()}
+                disabled={applyStandardTemplate.isPending}
+                className="rounded-xl btn-gradient px-6 py-2.5 text-xs font-bold text-white shadow-lg cursor-pointer disabled:opacity-50 flex items-center gap-2"
+              >
+                <Zap className="w-4 h-4 fill-white" />
+                <span>
+                  {applyStandardTemplate.isPending ? "Applying Syllabus Package..." : "⚡ Apply Standard Syllabus Now"}
+                </span>
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
       {/* ── MODAL: ⚡ BULK ADD / PASTE ALL CHAPTERS AT ONCE ─────────────────── */}
       {showBulkChapterModal && bulkActiveSubject && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 overflow-y-auto">
@@ -1033,19 +1498,37 @@ export default function SubjectsPage() {
               </button>
             </div>
 
-            {/* Instruction Tip */}
-            <div className="p-3.5 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-start gap-3 text-xs text-indigo-200">
-              <Sparkles className="w-4 h-4 text-indigo-400 flex-shrink-0 mt-0.5" />
-              <p className="leading-relaxed">
-                <strong className="text-white">Copy & Paste your chapter list directly below.</strong> You can paste from a PDF, WhatsApp, or textbook list (e.g. <em>1. Real Numbers</em> or <em>Polynomials</em>, one per line). Numbering will be cleaned and auto-indexed automatically!
-              </p>
+            {/* Quick 1-Click Standard Syllabus Preset Pills */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-[11px] font-bold text-amber-300 flex items-center gap-1">
+                  <Wand2 className="w-3.5 h-3.5 text-amber-400" />
+                  <span>1-Click Load Standard Preset Chapters:</span>
+                </label>
+              </div>
+
+              <div className="flex items-center gap-1.5 flex-wrap overflow-x-auto max-h-24 p-1.5 rounded-xl bg-white/[0.02] border border-white/10 scrollbar-thin">
+                {Object.entries(CHAPTER_PRESETS).map(([key, preset]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => {
+                      setBulkPasteText(preset.chapters.join("\n"));
+                      toast.success(`Loaded ${preset.chapters.length} chapters from ${preset.title}`);
+                    }}
+                    className="px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-white/5 hover:bg-amber-500/20 hover:text-amber-300 border border-white/10 text-slate-300 transition-colors cursor-pointer"
+                  >
+                    {preset.title}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Paste Textarea */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-slate-200 block">
-                  Paste Chapter Names (One per line) *
+                  Chapter Names List (One per line) *
                 </label>
                 <span className="text-[11px] font-bold text-amber-400">
                   {parsedBulkPreview.length} {parsedBulkPreview.length === 1 ? "Chapter" : "Chapters"} detected
@@ -1056,13 +1539,13 @@ export default function SubjectsPage() {
                 value={bulkPasteText}
                 onChange={(e) => setBulkPasteText(e.target.value)}
                 placeholder={`1. Real Numbers\n2. Polynomials\n3. Pair of Linear Equations in Two Variables\n4. Quadratic Equations\n5. Arithmetic Progressions\n6. Triangles\n7. Coordinate Geometry\n8. Introduction to Trigonometry\n9. Some Applications of Trigonometry\n10. Circles\n11. Areas Related to Circles\n12. Surface Areas and Volumes\n13. Statistics\n14. Probability`}
-                rows={8}
+                rows={7}
                 className="w-full rounded-2xl glass-input p-4 text-xs sm:text-sm text-white font-mono placeholder:font-sans placeholder:text-slate-500 resize-y border border-white/20 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20"
               />
             </div>
 
             {/* Defaults Configuration Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-2xl bg-white/[0.02] border border-white/10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-2xl bg-white/[0.02] border border-white/10">
               <div>
                 <label className="text-[11px] font-bold text-slate-300 block mb-1">
                   Default Estimated Hours (per chapter)
@@ -1071,7 +1554,7 @@ export default function SubjectsPage() {
                   type="number"
                   value={bulkDefaultHours}
                   onChange={(e) => setBulkDefaultHours(parseInt(e.target.value) || 1)}
-                  className="w-full rounded-xl glass-input px-3 py-2 text-xs text-white"
+                  className="w-full rounded-xl glass-input px-3 py-1.5 text-xs text-white"
                 />
               </div>
 
@@ -1082,7 +1565,7 @@ export default function SubjectsPage() {
                 <select
                   value={bulkDefaultDifficulty}
                   onChange={(e) => setBulkDefaultDifficulty(e.target.value as "easy" | "medium" | "hard")}
-                  className="w-full rounded-xl glass-input px-3 py-2 text-xs text-white cursor-pointer"
+                  className="w-full rounded-xl glass-input px-3 py-1.5 text-xs text-white cursor-pointer"
                 >
                   <option value="easy" className="bg-slate-900">Easy</option>
                   <option value="medium" className="bg-slate-900">Medium</option>
@@ -1099,7 +1582,7 @@ export default function SubjectsPage() {
                   <span>Will be mapped starting from Chapter #{(bulkActiveSubject.chapters?.length || 0) + 1}</span>
                 </div>
 
-                <div className="max-h-40 overflow-y-auto rounded-xl bg-slate-950/60 p-2.5 border border-white/10 space-y-1.5 scrollbar-thin">
+                <div className="max-h-32 overflow-y-auto rounded-xl bg-slate-950/60 p-2 border border-white/10 space-y-1.5 scrollbar-thin">
                   {parsedBulkPreview.map((ch, idx) => (
                     <div
                       key={idx}
