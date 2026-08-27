@@ -7,7 +7,7 @@ import { ChapterProgress } from '@/lib/models/ChapterProgress';
 import { requireAdmin } from '@/lib/auth';
 import { School } from '@/lib/models/School';
 import { Teacher } from '@/lib/models/Teacher';
-import { Country } from '@/lib/models/Lookup';
+import { Class, Board, Country, Batch, Course } from '@/lib/models/Lookup';
 import { validateAndFormatPhone } from '@/lib/phone';
 import { z } from 'zod';
 
@@ -41,6 +41,9 @@ export async function GET(req: NextRequest) {
   try {
     await requireAdmin(req);
     await connectDB();
+
+    // Reference all models to guarantee Mongoose schema registration for populate
+    void School; void Teacher; void Class; void Board; void Country; void Batch; void Course;
 
     const { searchParams } = new URL(req.url);
     const page = Math.max(1, parseInt(searchParams.get('page') || '1'));

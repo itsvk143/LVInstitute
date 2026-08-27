@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import { Student } from '@/lib/models/Student';
+import { School } from '@/lib/models/School';
+import { Teacher } from '@/lib/models/Teacher';
+import { Class, Board, Country, Batch, Course } from '@/lib/models/Lookup';
 import { requireAdmin } from '@/lib/auth';
 
 // GET /api/students/[id]
@@ -8,6 +11,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   try {
     await requireAdmin(req);
     await connectDB();
+    void School; void Teacher; void Class; void Board; void Country; void Batch; void Course;
     const { id } = await params;
     const student = await Student.findOne({ _id: id, deletedAt: null })
       .populate('school', 'name city country')
