@@ -419,26 +419,30 @@ export async function POST(req: NextRequest) {
           totalSubjectsCreated++;
         }
 
+        // Fetch all existing chapter numbers for this subject in ONE query
+        const existingChapters = await Chapter.find({ subject: subjectDoc._id }).select('chapterNumber').lean();
+        const existingSet = new Set(existingChapters.map((c) => c.chapterNumber));
+
+        // Prepare new chapters to insert in bulk
+        const chaptersToInsert = [];
         for (let i = 0; i < sub.chapters.length; i++) {
-          const chName = sub.chapters[i];
           const chNum = i + 1;
-
-          const existingChapter = await Chapter.findOne({
-            subject: subjectDoc._id,
-            chapterNumber: chNum,
-          });
-
-          if (!existingChapter) {
-            await Chapter.create({
+          if (!existingSet.has(chNum)) {
+            chaptersToInsert.push({
               subject: subjectDoc._id,
-              name: chName,
+              name: sub.chapters[i],
               chapterNumber: chNum,
               difficulty: 'medium',
               estimatedHours: 8,
               isActive: true,
             });
-            totalChaptersCreated++;
           }
+        }
+
+        // Insert all chapters in 1 single bulk DB call
+        if (chaptersToInsert.length > 0) {
+          await Chapter.insertMany(chaptersToInsert);
+          totalChaptersCreated += chaptersToInsert.length;
         }
       }
     }
