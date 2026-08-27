@@ -19,6 +19,11 @@ import {
   MapPin,
   Building2,
   SlidersHorizontal,
+  FileText,
+  Zap,
+  CheckCircle2,
+  ListPlus,
+  X,
 } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
@@ -60,6 +65,13 @@ interface ClassItem {
   grade?: number;
 }
 
+interface BulkChapterRow {
+  name: string;
+  chapterNumber: number;
+  difficulty: "easy" | "medium" | "hard";
+  estimatedHours: number;
+}
+
 export default function SubjectsPage() {
   const queryClient = useQueryClient();
 
@@ -92,9 +104,10 @@ export default function SubjectsPage() {
     board: "",
     color: "#6366F1",
     description: "",
+    initialChapters: "", // Paste chapters during subject creation
   });
 
-  // ── Chapter Creation / Edit Modal State ────────────────────────────────────
+  // ── Single Chapter Creation / Edit Modal State ─────────────────────────────
   const [showChapterModal, setShowChapterModal] = useState(false);
   const [editingChapter, setEditingChapter] = useState<ChapterItem | null>(null);
   const [activeSubjectId, setActiveSubjectId] = useState("");
@@ -105,6 +118,13 @@ export default function SubjectsPage() {
     estimatedHours: 10,
     description: "",
   });
+
+  // ── Bulk Chapter Modal State (Add All at Once) ────────────────────────────
+  const [showBulkChapterModal, setShowBulkChapterModal] = useState(false);
+  const [bulkActiveSubject, setBulkActiveSubject] = useState<SubjectItem | null>(null);
+  const [bulkPasteText, setBulkPasteText] = useState("");
+  const [bulkDefaultHours, setBulkDefaultHours] = useState(8);
+  const [bulkDefaultDifficulty, setBulkDefaultDifficulty] = useState<"easy" | "medium" | "hard">("medium");
 
   // ── Lookups Query ─────────────────────────────────────────────────────────
   const { data: lookups } = useQuery({
@@ -168,6 +188,34 @@ export default function SubjectsPage() {
     return found ? { name: found.name, city: found.city } : null;
   };
 
+  // ── Helper: Parse Bulk Pasted Text into Clean Chapter List ─────────────────
+  const parseBulkChapters = (text: string, startingNumber: number = 1): BulkChapterRow[] => {
+    if (!text || !text.trim()) return [];
+
+    const lines = text
+      .split("\n")
+      .map((l) => l.trim())
+      .filter((l) => l.length > 0);
+
+    return lines.map((line, idx) => {
+      // Clean leading prefixes like "1.", "1)", "Chapter 1:", "Unit 1 -", "1 -", etc.
+      let cleaned = line
+        .replace(/^(chapter|unit|ch\.?|lesson|module)\s*\d+[\s:\-–—\.]+/i, "")
+        .replace(/^\d+[\.\)\:\-–—\s]+\s*/, "")
+        .replace(/^[\-\•\*\–\—\>]\s*/, "")
+        .trim();
+
+      if (!cleaned) cleaned = line; // fallback if regex stripped everything
+
+      return {
+        name: cleaned,
+        chapterNumber: startingNumber + idx,
+        difficulty: bulkDefaultDifficulty,
+        estimatedHours: bulkDefaultHours,
+      };
+    });
+  };
+
   // ── School Mutation ───────────────────────────────────────────────────────
   const createSchool = useMutation({
     mutationFn: async () => axios.post("/api/schools", schoolForm),
@@ -197,19 +245,43 @@ export default function SubjectsPage() {
       if (editingSubject) {
         return axios.put(`/api/subjects/${editingSubject._id}`, subjectForm);
       }
-      return axios.post("/api/subjects", subjectForm);
+      const res = await axios.post("/api/subjects", subjectForm);
+      
+      // If initial chapters were pasted during creation, bulk add them immediately
+      if (subjectForm.initialChapters?.trim() && res.data.data?._id) {
+        const parsed = parseBulkChapters(subjectForm.initialChapters, 1);
+        if (parsed.length > 0) {
+          await axios.post("/api/chapters", {
+            subject: res.data.data._id,
+            chapters: parsed,
+          });
+        }
+      }
+      return res;
     },
-    onSuccess: () => {
-      toast.success(editingSubject ? "Subject updated successfully!" : "New subject created!");
+    onSuccess: (res) => {
+      toast.success(editingSubject ? "Subject updated successfully!" : "New subject & syllabus created!");
       setShowSubjectModal(false);
       
-      // Auto-switch to the created subject's class so it's immediately visible
+      // Auto-switch to created subject's class and expand it
       if (subjectForm.class) {
         setSelectedClassFilter(subjectForm.class);
       }
+      if (res.data.data?._id) {
+        setExpandedSubject(res.data.data._id);
+      }
 
       setEditingSubject(null);
-      setSubjectForm({ name: "", code: "", school: "", class: "", board: "", color: "#6366F1", description: "" });
+      setSubjectForm({
+        name: "",
+        code: "",
+        school: "",
+        class: "",
+        board: "",
+        color: "#6366F1",
+        description: "",
+        initialChapters: "",
+      });
       queryClient.invalidateQueries({ queryKey: ["subjects"] });
     },
     onError: (err: unknown) => {
@@ -227,7 +299,39 @@ export default function SubjectsPage() {
     onError: () => toast.error("Failed to delete subject"),
   });
 
-  // ── Chapter Mutations ─────────────────────────────────────────────────────
+  // ── Bulk Chapters Mutation (Save All at Once) ─────────────────────────────
+  const saveBulkChapters = useMutation({
+    mutationFn: async () => {
+      if (!bulkActiveSubject) throw new Error("No subject selected");
+      const startingNum = (bulkActiveSubject.chapters?.length || 0) + 1;
+      const parsed = parseBulkChapters(bulkPasteText, startingNum);
+      
+      if (parsed.length === 0) {
+        throw new Error("Please enter or paste at least one chapter name");
+      }
+
+      return axios.post("/api/chapters", {
+        subject: bulkActiveSubject._id,
+        chapters: parsed,
+      });
+    },
+    onSuccess: (res) => {
+      toast.success(res.data.message || "All chapters added to syllabus!");
+      setShowBulkChapterModal(false);
+      setBulkPasteText("");
+      if (bulkActiveSubject) {
+        setExpandedSubject(bulkActiveSubject._id);
+      }
+      setBulkActiveSubject(null);
+      queryClient.invalidateQueries({ queryKey: ["subjects"] });
+    },
+    onError: (err: unknown) => {
+      const error = err as { response?: { data?: { message?: string } }; message?: string };
+      toast.error(error.response?.data?.message || error.message || "Failed to add chapters");
+    },
+  });
+
+  // ── Single Chapter Mutations ──────────────────────────────────────────────
   const saveChapter = useMutation({
     mutationFn: async () => {
       if (editingChapter) {
@@ -268,6 +372,7 @@ export default function SubjectsPage() {
       board: lookups?.boards?.[0]?._id ?? "",
       color: "#6366F1",
       description: "",
+      initialChapters: "",
     });
     setShowSubjectModal(true);
   };
@@ -286,8 +391,16 @@ export default function SubjectsPage() {
       board: subBoardId,
       color: sub.color || "#6366F1",
       description: sub.description || "",
+      initialChapters: "",
     });
     setShowSubjectModal(true);
+  };
+
+  // Open Bulk Add Chapters Modal
+  const handleOpenBulkAddChapters = (sub: SubjectItem) => {
+    setBulkActiveSubject(sub);
+    setBulkPasteText("");
+    setShowBulkChapterModal(true);
   };
 
   const handleOpenAddChapter = (sub: SubjectItem) => {
@@ -329,7 +442,6 @@ export default function SubjectsPage() {
   // ── Organize subjects by class ───────────────────────────────────────────
   const subjectsByClass: Record<string, { classInfo: ClassItem; subjects: SubjectItem[] }> = {};
 
-  // First group all fetched subjects into their class
   for (const s of subjects) {
     const cId = getClassId(s);
     if (cId) {
@@ -348,7 +460,6 @@ export default function SubjectsPage() {
     }
   }
 
-  // If a specific class filter is selected (e.g. Class 6) and has 0 subjects, include it so the user can add subjects to it
   if (selectedClassFilter && !subjectsByClass[selectedClassFilter]) {
     const found = classes.find((c) => String(c._id) === String(selectedClassFilter));
     if (found) {
@@ -359,7 +470,6 @@ export default function SubjectsPage() {
     }
   }
 
-  // If NO subjects exist at all in database yet, show the first 3 classes so admin has direct jump-off points
   if (Object.keys(subjectsByClass).length === 0 && classes.length > 0) {
     for (const c of classes.slice(0, 3)) {
       subjectsByClass[c._id] = { classInfo: c, subjects: [] };
@@ -368,6 +478,10 @@ export default function SubjectsPage() {
 
   const activeSchoolObj = schools.find((s) => String(s._id) === String(selectedSchoolId));
   const activeClassObj = classes.find((c) => String(c._id) === String(selectedClassFilter));
+
+  const parsedBulkPreview = bulkActiveSubject
+    ? parseBulkChapters(bulkPasteText, (bulkActiveSubject.chapters?.length || 0) + 1)
+    : [];
 
   return (
     <div className="space-y-6 pb-20">
@@ -415,7 +529,7 @@ export default function SubjectsPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-          {/* 1. Student's School & Location Dropdown (with + Add New School as FIRST option) */}
+          {/* 1. Student's School & Location Dropdown */}
           <div className="space-y-1">
             <label className="text-[11px] font-semibold text-slate-400 flex items-center gap-1.5">
               <School className="w-3.5 h-3.5 text-cyan-400" />
@@ -555,29 +669,6 @@ export default function SubjectsPage() {
             })}
           </div>
         </div>
-
-        {/* Active Scope Summary Banner */}
-        <div className="p-3 rounded-2xl bg-white/[0.03] border border-white/5 flex flex-wrap items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_#06B6D4]" />
-            <span className="text-slate-400">Viewing Scope:</span>
-            <span className="font-bold text-white">
-              {selectedClassFilter ? `${activeClassObj?.name || "Class"} • ` : "All Classes • "}
-              {selectedSchoolId === "all"
-                ? "All Schools Combined"
-                : selectedSchoolId === "global"
-                ? "General / Shared Common Syllabus"
-                : `${activeSchoolObj?.name || "School"} (${activeSchoolObj?.city || ""})`}
-            </span>
-          </div>
-
-          <button
-            onClick={() => handleOpenAddSubject(selectedClassFilter)}
-            className="text-xs font-bold text-indigo-300 hover:text-white flex items-center gap-1 cursor-pointer"
-          >
-            <Plus className="w-3.5 h-3.5" /> Add Subject to {selectedClassFilter ? activeClassObj?.name || "Class" : "Curriculum"}
-          </button>
-        </div>
       </div>
 
       {/* ── Class & Subjects Cards Grid ────────────────────────────────────── */}
@@ -716,18 +807,29 @@ export default function SubjectsPage() {
                                     </span>
                                   )}
 
-                                  <span className="text-slate-400 font-bold">• {chapters.length} Chapters</span>
+                                  <span className="text-slate-300 font-bold">• {chapters.length} Chapters</span>
                                 </div>
                               </div>
                             </div>
 
                             {/* Right Actions */}
-                            <div className="flex items-center gap-2 self-end sm:self-auto" onClick={(e) => e.stopPropagation()}>
+                            <div className="flex items-center gap-2 self-end sm:self-auto flex-wrap" onClick={(e) => e.stopPropagation()}>
+                              {/* ⚡ Quick Add All Chapters at Once */}
+                              <button
+                                onClick={() => handleOpenBulkAddChapters(sub)}
+                                className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 px-3 py-1.5 text-xs font-bold shadow-xs cursor-pointer hover:scale-105 transition-all"
+                                title="Paste all chapters for this subject at once"
+                              >
+                                <Zap className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                                <span>Paste All Chapters</span>
+                              </button>
+
                               <button
                                 onClick={() => handleOpenAddChapter(sub)}
                                 className="inline-flex items-center gap-1 rounded-xl btn-gradient px-3 py-1.5 text-xs font-bold text-white shadow cursor-pointer hover:scale-105 transition-transform"
+                                title="Add Single Chapter"
                               >
-                                <Plus className="w-3.5 h-3.5" /> Add Chapter
+                                <Plus className="w-3.5 h-3.5" /> +1 Chapter
                               </button>
 
                               <button
@@ -769,27 +871,56 @@ export default function SubjectsPage() {
                                 transition={{ duration: 0.22 }}
                                 className="border-t border-white/10 bg-slate-950/40 p-4 sm:p-5"
                               >
-                                <div className="flex items-center justify-between mb-3">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                                   <div className="flex items-center gap-2">
                                     <Layers className="w-4 h-4 text-indigo-400" />
                                     <h4 className="text-xs font-bold text-white uppercase tracking-wider">
                                       Chapters under {sub.name} ({chapters.length})
                                     </h4>
                                   </div>
-                                  <span className="text-[11px] text-slate-400">
-                                    Auto-mapped to all {classInfo.name} students
-                                  </span>
+                                  
+                                  <div className="flex items-center gap-2">
+                                    <button
+                                      onClick={() => handleOpenBulkAddChapters(sub)}
+                                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-xs font-bold cursor-pointer"
+                                    >
+                                      <Zap className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                                      + Paste Multiple Chapters
+                                    </button>
+
+                                    <button
+                                      onClick={() => handleOpenAddChapter(sub)}
+                                      className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-xs font-bold cursor-pointer"
+                                    >
+                                      <Plus className="w-3.5 h-3.5" /> +1 Chapter
+                                    </button>
+                                  </div>
                                 </div>
 
                                 {chapters.length === 0 ? (
-                                  <div className="py-6 text-center text-slate-400 rounded-xl bg-white/[0.02] border border-dashed border-white/10">
-                                    <p className="text-xs">No chapters added yet to this subject.</p>
-                                    <button
-                                      onClick={() => handleOpenAddChapter(sub)}
-                                      className="mt-1.5 text-xs font-bold text-indigo-400 hover:text-indigo-300 underline cursor-pointer"
-                                    >
-                                      + Add Chapter 1
-                                    </button>
+                                  <div className="py-8 text-center text-slate-400 rounded-2xl bg-white/[0.02] border border-dashed border-white/10 space-y-3">
+                                    <FileText className="mx-auto h-8 w-8 text-slate-600" />
+                                    <div>
+                                      <p className="text-xs font-bold text-white">No chapters added yet to this subject.</p>
+                                      <p className="text-[11px] text-slate-500 mt-0.5">
+                                        You can paste your entire syllabus list at once or add chapters one by one.
+                                      </p>
+                                    </div>
+                                    <div className="flex items-center justify-center gap-2 pt-1">
+                                      <button
+                                        onClick={() => handleOpenBulkAddChapters(sub)}
+                                        className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-2 text-xs font-bold text-white shadow-lg cursor-pointer hover:opacity-95"
+                                      >
+                                        <Zap className="w-4 h-4 fill-white" />
+                                        ⚡ Paste Entire Syllabus at Once
+                                      </button>
+                                      <button
+                                        onClick={() => handleOpenAddChapter(sub)}
+                                        className="rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 px-3.5 py-2 text-xs font-bold text-slate-300 cursor-pointer"
+                                      >
+                                        + Add Single Chapter
+                                      </button>
+                                    </div>
                                   </div>
                                 ) : (
                                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
@@ -865,6 +996,152 @@ export default function SubjectsPage() {
           })
         )}
       </div>
+
+      {/* ── MODAL: ⚡ BULK ADD / PASTE ALL CHAPTERS AT ONCE ─────────────────── */}
+      {showBulkChapterModal && bulkActiveSubject && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 overflow-y-auto">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="w-full max-w-2xl rounded-3xl glass-panel p-6 sm:p-8 shadow-2xl border border-white/15 my-8 space-y-5"
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                  <Zap className="w-6 h-6 fill-amber-400" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-extrabold text-white" style={{ fontFamily: "Outfit, sans-serif" }}>
+                    Quick Add All Chapters at Once
+                  </h3>
+                  <p className="text-xs text-slate-300 mt-0.5">
+                    Subject: <span className="text-indigo-300 font-bold">{bulkActiveSubject.name}</span> •{" "}
+                    Class: <span className="text-cyan-300 font-bold">{getClassName(bulkActiveSubject)}</span>
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowBulkChapterModal(false)}
+                className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Instruction Tip */}
+            <div className="p-3.5 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-start gap-3 text-xs text-indigo-200">
+              <Sparkles className="w-4 h-4 text-indigo-400 flex-shrink-0 mt-0.5" />
+              <p className="leading-relaxed">
+                <strong className="text-white">Copy & Paste your chapter list directly below.</strong> You can paste from a PDF, WhatsApp, or textbook list (e.g. <em>1. Real Numbers</em> or <em>Polynomials</em>, one per line). Numbering will be cleaned and auto-indexed automatically!
+              </p>
+            </div>
+
+            {/* Paste Textarea */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-slate-200 block">
+                  Paste Chapter Names (One per line) *
+                </label>
+                <span className="text-[11px] font-bold text-amber-400">
+                  {parsedBulkPreview.length} {parsedBulkPreview.length === 1 ? "Chapter" : "Chapters"} detected
+                </span>
+              </div>
+              
+              <textarea
+                value={bulkPasteText}
+                onChange={(e) => setBulkPasteText(e.target.value)}
+                placeholder={`1. Real Numbers\n2. Polynomials\n3. Pair of Linear Equations in Two Variables\n4. Quadratic Equations\n5. Arithmetic Progressions\n6. Triangles\n7. Coordinate Geometry\n8. Introduction to Trigonometry\n9. Some Applications of Trigonometry\n10. Circles\n11. Areas Related to Circles\n12. Surface Areas and Volumes\n13. Statistics\n14. Probability`}
+                rows={8}
+                className="w-full rounded-2xl glass-input p-4 text-xs sm:text-sm text-white font-mono placeholder:font-sans placeholder:text-slate-500 resize-y border border-white/20 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20"
+              />
+            </div>
+
+            {/* Defaults Configuration Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-2xl bg-white/[0.02] border border-white/10">
+              <div>
+                <label className="text-[11px] font-bold text-slate-300 block mb-1">
+                  Default Estimated Hours (per chapter)
+                </label>
+                <input
+                  type="number"
+                  value={bulkDefaultHours}
+                  onChange={(e) => setBulkDefaultHours(parseInt(e.target.value) || 1)}
+                  className="w-full rounded-xl glass-input px-3 py-2 text-xs text-white"
+                />
+              </div>
+
+              <div>
+                <label className="text-[11px] font-bold text-slate-300 block mb-1">
+                  Default Difficulty Level
+                </label>
+                <select
+                  value={bulkDefaultDifficulty}
+                  onChange={(e) => setBulkDefaultDifficulty(e.target.value as "easy" | "medium" | "hard")}
+                  className="w-full rounded-xl glass-input px-3 py-2 text-xs text-white cursor-pointer"
+                >
+                  <option value="easy" className="bg-slate-900">Easy</option>
+                  <option value="medium" className="bg-slate-900">Medium</option>
+                  <option value="hard" className="bg-slate-900">Hard</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Live Parsed Preview */}
+            {parsedBulkPreview.length > 0 && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs text-slate-400">
+                  <span className="font-bold text-slate-200">Parsed Chapters Live Preview:</span>
+                  <span>Will be mapped starting from Chapter #{(bulkActiveSubject.chapters?.length || 0) + 1}</span>
+                </div>
+
+                <div className="max-h-40 overflow-y-auto rounded-xl bg-slate-950/60 p-2.5 border border-white/10 space-y-1.5 scrollbar-thin">
+                  {parsedBulkPreview.map((ch, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-white/[0.03] border border-white/5"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="w-5 h-5 rounded bg-indigo-500/20 text-indigo-300 font-bold text-[10px] flex items-center justify-center flex-shrink-0">
+                          {ch.chapterNumber}
+                        </span>
+                        <span className="text-white font-medium truncate">{ch.name}</span>
+                      </div>
+                      <span className="text-[10px] text-slate-400 font-mono">{ch.estimatedHours}h</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Modal Actions */}
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
+              <button
+                type="button"
+                onClick={() => setShowBulkChapterModal(false)}
+                className="rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2.5 text-xs font-semibold text-slate-300 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={() => saveBulkChapters.mutate()}
+                disabled={saveBulkChapters.isPending || parsedBulkPreview.length === 0}
+                className="rounded-xl btn-gradient px-6 py-2.5 text-xs font-bold text-white shadow-lg cursor-pointer disabled:opacity-50 flex items-center gap-2"
+              >
+                <Zap className="w-4 h-4 fill-white" />
+                <span>
+                  {saveBulkChapters.isPending
+                    ? "Saving All Chapters..."
+                    : `Save All (${parsedBulkPreview.length}) Chapters`}
+                </span>
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       {/* ── MODAL: Create New School & Location ──────────────────────────────── */}
       {showSchoolModal && (
@@ -954,13 +1231,13 @@ export default function SubjectsPage() {
         </div>
       )}
 
-      {/* ── MODAL: Create / Edit Subject ────────────────────────────────────── */}
+      {/* ── MODAL: Create / Edit Subject (With One-Click Initial Chapters) ──── */}
       {showSubjectModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 overflow-y-auto">
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="w-full max-w-lg rounded-3xl glass-panel p-6 sm:p-8 shadow-2xl border border-white/15"
+            className="w-full max-w-lg rounded-3xl glass-panel p-6 sm:p-8 shadow-2xl border border-white/15 my-8"
           >
             <div className="flex items-center gap-3 mb-5">
               <div className="p-2.5 rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
@@ -1068,7 +1345,7 @@ export default function SubjectsPage() {
                   <input
                     value={subjectForm.code}
                     onChange={(e) => setSubjectForm({ ...subjectForm, code: e.target.value })}
-                    placeholder="MATH-10"
+                    placeholder="01"
                     className="w-full rounded-xl glass-input px-3.5 py-2.5 text-xs text-white uppercase"
                   />
                 </div>
@@ -1097,6 +1374,23 @@ export default function SubjectsPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Optional: Add all chapters right now during creation */}
+              {!editingSubject && (
+                <div className="pt-2 border-t border-white/10 space-y-1.5">
+                  <label className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                    <Zap className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                    <span>Quick Add Chapters (Optional - Paste list one per line)</span>
+                  </label>
+                  <textarea
+                    value={subjectForm.initialChapters}
+                    onChange={(e) => setSubjectForm({ ...subjectForm, initialChapters: e.target.value })}
+                    placeholder="1. Real Numbers&#10;2. Polynomials&#10;3. Quadratic Equations..."
+                    rows={4}
+                    className="w-full rounded-xl glass-input p-3 text-xs text-white placeholder-slate-500 font-mono resize-none"
+                  />
+                </div>
+              )}
             </div>
 
             <div className="mt-7 flex justify-end gap-2.5">
@@ -1111,14 +1405,14 @@ export default function SubjectsPage() {
                 disabled={saveSubject.isPending || !subjectForm.name || !subjectForm.class || !subjectForm.board}
                 className="rounded-xl btn-gradient px-5 py-2 text-xs font-bold text-white shadow-lg cursor-pointer disabled:opacity-50"
               >
-                {editingSubject ? "Update Subject" : "Create Subject"}
+                {saveSubject.isPending ? "Saving..." : editingSubject ? "Update Subject" : "Create Subject & Chapters"}
               </button>
             </div>
           </motion.div>
         </div>
       )}
 
-      {/* ── MODAL: Create / Edit Chapter ────────────────────────────────────── */}
+      {/* ── MODAL: Single Chapter Create / Edit ─────────────────────────────── */}
       {showChapterModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4">
           <motion.div
