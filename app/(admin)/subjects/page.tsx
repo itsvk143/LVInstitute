@@ -787,16 +787,16 @@ export default function SubjectsPage() {
     }
   }
 
-  // Filter available classes to ONLY those that have subjects in the current view/scope
-  const visibleClassesForScope = classes.filter((c) => {
-    const count = classSubjectCountMap.get(c._id) || 0;
-    return count > 0 || selectedClassFilter === c._id;
-  });
-
-  const displayedClasses = visibleClassesForScope.length > 0 ? visibleClassesForScope : classes;
-
   const activeSchoolObj = schools.find((s) => String(s._id) === String(selectedSchoolId));
   const activeClassObj = classes.find((c) => String(c._id) === String(selectedClassFilter));
+
+  // If NEET is selected, restrict to Class 12.
+  // For ALL other schools (DAV, DPS, KV, All Schools, etc.), show ALL classes (Class 3 to 12) so user can view/add any class!
+  const isNeetSelected = activeSchoolObj && (activeSchoolObj.code === "NEET" || activeSchoolObj.name.toUpperCase().includes("NEET"));
+
+  const displayedClasses = isNeetSelected
+    ? classes.filter((c) => (c.grade === 12 || c.name.includes("12") || (classSubjectCountMap.get(c._id) || 0) > 0))
+    : classes;
 
   const parsedBulkPreview = bulkActiveSubject
     ? parseBulkChapters(bulkPasteText, (bulkActiveSubject.chapters?.length || 0) + 1)
