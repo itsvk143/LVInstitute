@@ -41,9 +41,15 @@ export async function GET(req: NextRequest) {
     const rawSchoolId = student.school;
 
     const subjectFilter: Record<string, unknown> = { isActive: true };
-    if (rawClassId) subjectFilter.class = rawClassId;
-    if (rawSchoolId) {
+    if (rawSchoolId && rawClassId) {
+      subjectFilter.$or = [
+        { school: rawSchoolId },
+        { class: rawClassId, $or: [{ school: null }, { school: { $exists: false } }] },
+      ];
+    } else if (rawSchoolId) {
       subjectFilter.$or = [{ school: rawSchoolId }, { school: null }, { school: { $exists: false } }];
+    } else if (rawClassId) {
+      subjectFilter.class = rawClassId;
     }
 
     const relevantSubjects = await Subject.find(subjectFilter).select('_id name color icon').lean();
