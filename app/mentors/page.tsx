@@ -42,17 +42,102 @@ interface Teacher {
   isActive: boolean;
 }
 
+const DEFAULT_FALLBACK_TEACHERS: Teacher[] = [
+  {
+    _id: "cvk-vikash-sir",
+    name: "Mr. Vikash Kumar (CVK Sir)",
+    email: "itsvikash143@gmail.com",
+    phone: "8457876843",
+    website: "www.cvksir.in",
+    qualification: "Senior Chemistry Lecturer • M.Sc Chemistry (10+ Yrs Exp)",
+    experienceYears: "10+ Years",
+    bio: "Senior Chemistry Educator with over 10 years of experience in mentoring students for National & State Level competitive exams like IIT-JEE (Mains & Advanced), NEET UG, CUET, CBSE/ICSE Boards, KVPY, and International Chemistry Olympiads (IChO). Guided numerous students from India and abroad to excel through strategic conceptual clarity, rapid reaction mechanisms, and result-oriented mentorship. Passionate about making Chemistry intuitive, visual, and scoring.",
+    achievements: [
+      "Top 50 AIR Rankers Produced in JEE Advanced & NEET UG",
+      "Ex-Faculty at Aakash Institute (Bhubaneswar & Haldwani)",
+      "Ex-Faculty at Narayana Institute & Resonance Edventures",
+      "Over 5,000+ Students Mentored with 98%+ Qualification Rate",
+      "Creator of 30-Second Physical Chemistry Calculation Shortcuts & Reaction Flowcharts",
+    ],
+    experienceTimeline: [
+      { role: "Senior Chemistry Lecturer", organization: "Aakash Institute, Bhubaneswar", period: "June 2022 - Present" },
+      { role: "Senior Chemistry Lecturer", organization: "Narayana Institute", period: "May 2021 - May 2022" },
+      { role: "Chemistry Lecturer", organization: "Aakash Institute, Haldwani", period: "Feb 2019 - March 2020" },
+      { role: "Chemistry Lecturer", organization: "Resonance Edventures", period: "June 2016 - Jan 2019" },
+    ],
+    subjectDomains: [
+      "Physical Chemistry",
+      "Organic Chemistry",
+      "Inorganic Chemistry",
+      "Reaction Mechanisms & Flowcharts",
+      "Coordination & Chemical Bonding",
+    ],
+    targetExams: [
+      "National & International Olympiads",
+      "Chemistry Olympiad (IChO & INChO)",
+      "Junior Science Olympiad (IJSO & NSEJS)",
+      "Pre-Olympiad Foundation (Class 8–10)",
+      "JEE Advanced (IIT)",
+      "JEE Mains",
+      "NEET UG (Medical)",
+      "CBSE & ICSE Boards (95%+)",
+      "KVPY & CUET",
+    ],
+    specialization: ["Physical Chemistry", "Organic Chemistry", "Inorganic Chemistry", "JEE Advanced", "NEET UG"],
+    isActive: true,
+  },
+  {
+    _id: "laxmi-kumari",
+    name: "Ms. Laxmi Kumari",
+    email: "laxmeena01@gmail.com",
+    phone: "9900346997",
+    qualification: "Senior Biology, Botany & Zoology Faculty • M.Sc Biotechnology (10+ Yrs Exp)",
+    experienceYears: "10+ Years",
+    bio: "Senior Biology, Botany & Zoology Faculty with over 10 years of dedicated experience in preparing students for Medical Entrance Examinations (NEET UG Target 360/360, PMT, State Medical Entrances) and 10+2 Boards. Comprehensive expertise spanning Botany (Plant Physiology & Anatomy), Zoology (Human Physiology & Reproduction), Biotechnology, Genetics, and NCERT line-by-line decoding.",
+    achievements: [
+      "Mentored hundreds of medical aspirants achieving 340+ in NEET Biology (Botany + Zoology)",
+      "Senior Botany & Biology Faculty at Aakash Institute, Bhubaneswar (March 2022 - Present)",
+      "Ex-Faculty at Narayana E-Techno (Guwahati) & Narayana PU College (Bengaluru)",
+      "Ex-Faculty at Potential and Concept Education & A.S. Study Circle (Mysore)",
+      "M.Sc Biotechnology Degree from University of Mysore",
+    ],
+    experienceTimeline: [
+      { role: "Botany Faculty", organization: "Aakash Institute, Bhubaneswar", period: "March 2022 - Present" },
+      { role: "Biology Faculty", organization: "Narayana E-Techno, Guwahati", period: "July 2021 - Feb 2022" },
+      { role: "Biology Faculty", organization: "Potential and Concept Education", period: "2018 - 2021" },
+      { role: "Biology Faculty", organization: "Narayana PU College, Bengaluru", period: "2015 - 2018" },
+      { role: "Biology Faculty", organization: "A.S. Study Circle, Mysore", period: "2013 - 2015" },
+    ],
+    subjectDomains: ["Botany", "Zoology", "Biology", "Biotechnology", "Human Physiology", "Genetics"],
+    targetExams: [
+      "NEET UG (Medical Target 360/360)",
+      "Biology Olympiad (IBO & INBO)",
+      "CBSE & ICSE Class 11/12 Boards (95%+)",
+      "Junior Science Olympiad (IJSO & NSEJS)",
+      "Pre-Medical PMT & Foundation",
+    ],
+    specialization: ["Botany", "Zoology", "Biology", "Biotechnology", "NEET UG"],
+    isActive: true,
+  },
+];
+
 export default function PublicMentorsPage() {
   const [search, setSearch] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("all");
 
-  const { data: teachers = [], isLoading } = useQuery<Teacher[]>({
+  const { data: apiTeachers, isLoading } = useQuery<Teacher[]>({
     queryKey: ["public-teachers", search],
     queryFn: async () => {
-      const res = await axios.get(`/api/teachers?search=${search}`);
-      return res.data.data;
+      try {
+        const res = await axios.get(`/api/teachers?search=${search}`);
+        return res.data.data;
+      } catch {
+        return [];
+      }
     },
   });
+
+  const teachers = (apiTeachers && apiTeachers.length > 0) ? apiTeachers : DEFAULT_FALLBACK_TEACHERS;
 
   const filteredTeachers = teachers.filter((t) => {
     if (selectedSubject === "all") return true;

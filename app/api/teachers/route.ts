@@ -5,7 +5,6 @@ import { requireAdmin } from '@/lib/auth';
 
 export async function GET(req: NextRequest) {
   try {
-    await requireAdmin(req);
     await connectDB();
 
     const { searchParams } = new URL(req.url);
