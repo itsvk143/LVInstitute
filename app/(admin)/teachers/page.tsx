@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { GraduationCap, Plus, Search, Mail, Phone, Sparkles } from "lucide-react";
+import { GraduationCap, Plus, Search, Mail, Phone, Sparkles, Globe, ArrowRight } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
 
@@ -86,7 +87,7 @@ export default function TeachersPage() {
             <p className="text-xs text-slate-500 mt-1">Try adjusting your search criteria or enroll a new faculty member</p>
           </div>
         ) : (
-          teachers.map((teacher: { _id: string; name: string; email: string; phone: string; qualification?: string; specialization?: string[] }) => (
+          teachers.map((teacher: { _id: string; name: string; email: string; phone: string; qualification?: string; specialization?: string[]; website?: string }) => (
             <motion.div
               key={teacher._id}
               initial={{ opacity: 0, y: 10 }}
@@ -116,18 +117,41 @@ export default function TeachersPage() {
                   <p className="flex items-center gap-2">
                     <Phone className="h-3.5 w-3.5 text-teal-400" /> {teacher.phone}
                   </p>
+                  {teacher.website && (
+                    <p className="flex items-center gap-2">
+                      <a
+                        href={teacher.website.startsWith("http") ? teacher.website : `https://${teacher.website}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 text-indigo-300 hover:text-indigo-200 hover:underline font-medium"
+                      >
+                        <Globe className="h-3.5 w-3.5 text-purple-400" />
+                        <span>{teacher.website.replace(/^https?:\/\//, "")}</span>
+                      </a>
+                    </p>
+                  )}
                 </div>
               </div>
 
               {teacher.specialization && teacher.specialization.length > 0 && (
                 <div className="mt-5 border-t border-white/10 pt-3.5 flex flex-wrap gap-1.5">
-                  {teacher.specialization.map((s, idx) => (
+                  {teacher.specialization.map((s: string, idx: number) => (
                     <span key={idx} className="rounded-lg bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 px-2.5 py-0.5 text-[11px] font-medium">
                       {s}
                     </span>
                   ))}
                 </div>
               )}
+
+              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between gap-2">
+                <Link
+                  href={`/mentors/${teacher._id}`}
+                  className="flex-1 py-2 px-3 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/35 text-indigo-300 hover:text-white border border-indigo-500/30 text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
+                >
+                  <span>View Detailed Profile & Edit</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
             </motion.div>
           ))
         )}
@@ -146,23 +170,27 @@ export default function TeachersPage() {
             <div className="space-y-3.5">
               <div>
                 <label className="text-xs font-semibold text-slate-300 mb-1 block">Full Name *</label>
-                <input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="e.g. Dr. Priya Sharma" className="w-full rounded-xl glass-input px-3.5 py-2.5 text-xs text-white" />
+                <input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="e.g. Mr. Vikash Kumar (CVK Sir)" className="w-full rounded-xl glass-input px-3.5 py-2.5 text-xs text-white" />
               </div>
               <div>
                 <label className="text-xs font-semibold text-slate-300 mb-1 block">Email Address *</label>
-                <input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} placeholder="priya@lvinstitute.com" className="w-full rounded-xl glass-input px-3.5 py-2.5 text-xs text-white" />
+                <input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} placeholder="itsvikash143@gmail.com" className="w-full rounded-xl glass-input px-3.5 py-2.5 text-xs text-white" />
               </div>
               <div>
                 <label className="text-xs font-semibold text-slate-300 mb-1 block">Phone Number *</label>
-                <input value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="+91 9876543210" className="w-full rounded-xl glass-input px-3.5 py-2.5 text-xs text-white" />
+                <input value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="+91 8457876843" className="w-full rounded-xl glass-input px-3.5 py-2.5 text-xs text-white" />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-slate-300 mb-1 block">Website / Portfolio</label>
+                <input value={(formData as any).website || ""} onChange={(e) => setFormData({ ...formData, ...( { website: e.target.value } as any) })} placeholder="e.g. www.cvksir.in" className="w-full rounded-xl glass-input px-3.5 py-2.5 text-xs text-white" />
               </div>
               <div>
                 <label className="text-xs font-semibold text-slate-300 mb-1 block">Qualifications</label>
-                <input value={formData.qualification} onChange={(e) => setFormData({ ...formData, qualification: e.target.value })} placeholder="e.g. M.Sc, Ph.D Mathematics" className="w-full rounded-xl glass-input px-3.5 py-2.5 text-xs text-white" />
+                <input value={formData.qualification} onChange={(e) => setFormData({ ...formData, qualification: e.target.value })} placeholder="e.g. Senior Chemistry Lecturer (10+ Yrs Exp, Ex-Aakash)" className="w-full rounded-xl glass-input px-3.5 py-2.5 text-xs text-white" />
               </div>
               <div>
                 <label className="text-xs font-semibold text-slate-300 mb-1 block">Specializations (comma separated)</label>
-                <input value={formData.specialization} onChange={(e) => setFormData({ ...formData, specialization: e.target.value })} placeholder="Mathematics, Physics" className="w-full rounded-xl glass-input px-3.5 py-2.5 text-xs text-white" />
+                <input value={formData.specialization} onChange={(e) => setFormData({ ...formData, specialization: e.target.value })} placeholder="Chemistry, Physical Chemistry, Organic Chemistry" className="w-full rounded-xl glass-input px-3.5 py-2.5 text-xs text-white" />
               </div>
             </div>
             <div className="mt-6 flex justify-end gap-2.5">

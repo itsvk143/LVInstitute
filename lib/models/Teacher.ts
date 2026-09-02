@@ -6,7 +6,14 @@ export interface ITeacher extends Document {
   phone?: string;
   photo?: string;
   qualification?: string;
+  bio?: string;
+  experienceYears?: number | string;
+  achievements?: string[];
+  experienceTimeline?: Array<{ role: string; organization: string; period: string }>;
   specialization?: string[];
+  subjectDomains?: string[];
+  targetExams?: string[];
+  website?: string;
   subjects?: Types.ObjectId[];
   isActive: boolean;
   deletedAt?: Date;
@@ -21,7 +28,20 @@ const TeacherSchema = new Schema<ITeacher>(
     phone: { type: String, trim: true },
     photo: { type: String },
     qualification: { type: String },
+    bio: { type: String },
+    experienceYears: { type: Schema.Types.Mixed },
+    achievements: [{ type: String }],
+    experienceTimeline: [
+      {
+        role: { type: String },
+        organization: { type: String },
+        period: { type: String },
+      },
+    ],
     specialization: [{ type: String }],
+    subjectDomains: [{ type: String }],
+    targetExams: [{ type: String }],
+    website: { type: String, trim: true },
     subjects: [{ type: Schema.Types.ObjectId, ref: 'Subject' }],
     isActive: { type: Boolean, default: true },
     deletedAt: { type: Date, default: null },

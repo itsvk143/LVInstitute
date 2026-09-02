@@ -131,13 +131,53 @@ async function seed() {
   // ── Teachers ─────────────────────────────────────────────────────────────────
   console.log('👩‍🏫 Creating teachers...');
   const teachers = await Teacher.insertMany([
+    {
+      name: 'Ms. Laxmi Kumari',
+      email: 'laxmeena01@gmail.com',
+      phone: '9900346997',
+      qualification: 'Senior Biology, Botany & Zoology Faculty • M.Sc Biotechnology (10+ Yrs Exp)',
+      experienceYears: '10+ Years',
+      bio: 'Senior Biology, Botany & Zoology Faculty with over 10 years of dedicated experience in preparing students for Medical Entrance Examinations (NEET UG Target 360/360, PMT, State Medical Entrances) and 10+2 Boards. Comprehensive expertise spanning Botany (Plant Physiology & Anatomy), Zoology (Human Physiology & Reproduction), Biotechnology, Genetics, and NCERT line-by-line decoding. Proven pedagogical track record at premier national institutes including Aakash Institute (Bhubaneswar), Narayana E-Techno, and Concept Education.',
+      subjectDomains: [
+        'Botany',
+        'Zoology',
+        'Biology',
+        'Biotechnology',
+      ],
+      targetExams: [
+        'NEET UG (Medical Target 360/360)',
+        'Biology Olympiad (IBO & INBO)',
+        'CBSE & ICSE Class 11/12 Boards (95%+)',
+        'Junior Science Olympiad (IJSO & NSEJS)',
+        'Pre-Medical PMT & Foundation',
+      ],
+      specialization: ['Botany', 'Zoology', 'Biology', 'Biotechnology'],
+      achievements: [
+        'Mentored hundreds of medical aspirants achieving 340+ in NEET Biology (Botany + Zoology)',
+        'Senior Botany & Biology Faculty at Aakash Institute, Bhubaneswar (March 2022 - Present)',
+        'Ex-Faculty at Narayana E-Techno (Guwahati) & Narayana PU College (Bengaluru)',
+        'Ex-Faculty at Potential and Concept Education & A.S. Study Circle (Mysore)',
+        'M.Sc Biotechnology Degree from University of Mysore',
+      ],
+      experienceTimeline: [
+        { role: 'Botany Faculty', organization: 'Aakash Institute, Bhubaneswar', period: 'March 2022 - Present' },
+        { role: 'Biology Faculty', organization: 'Narayana E-Techno, Guwahati', period: 'July 2021 - Feb 2022' },
+        { role: 'Biology Faculty', organization: 'Potential and Concept Education', period: '2018 - 2021' },
+        { role: 'Biology Faculty', organization: 'Narayana PU College, Bengaluru', period: '2015 - 2018' },
+        { role: 'Biology Faculty', organization: 'A.S. Study Circle, Mysore', period: '2013 - 2015' },
+      ],
+      isActive: true,
+    },
+    { name: 'Mr. Vikash Kumar (CVK Sir)', email: 'itsvikash143@gmail.com', phone: '8457876843', qualification: 'Senior Chemistry Lecturer (10+ Yrs Exp, Ex-Aakash)', specialization: ['Chemistry', 'Physical Chemistry', 'Organic Chemistry', 'Inorganic Chemistry'] },
     { name: 'Dr. Priya Sharma', email: 'priya@lvinstitute.com', phone: '9876543210', qualification: 'M.Sc, Ph.D Mathematics', specialization: ['Mathematics', 'Physics'] },
     { name: 'Mr. Rahul Verma', email: 'rahul@lvinstitute.com', phone: '9876543211', qualification: 'M.Sc Chemistry', specialization: ['Chemistry', 'Biology'] },
     { name: 'Ms. Anita Patel', email: 'anita@lvinstitute.com', phone: '9876543212', qualification: 'M.A English', specialization: ['English', 'Social Science'] },
     { name: 'Mr. Suresh Kumar', email: 'suresh@lvinstitute.com', phone: '9876543213', qualification: 'M.Sc Physics', specialization: ['Physics', 'Mathematics'] },
   ]);
-  const priya = teachers[0];
-  const rahul = teachers[1];
+  const laxmi = teachers[0];
+  const vikash = teachers[1];
+  const priya = teachers[2];
+  const rahul = teachers[3];
 
   // ── Subjects ─────────────────────────────────────────────────────────────────
   console.log('📖 Creating subjects...');
