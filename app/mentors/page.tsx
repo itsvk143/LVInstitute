@@ -139,9 +139,9 @@ export default function PublicMentorsPage() {
             className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight"
             style={{ fontFamily: "Outfit, sans-serif" }}
           >
-            Learn from India's Most Accomplished <br className="hidden sm:inline" />
+            Choose the Teacher.{" "}
             <span className="bg-gradient-to-r from-amber-300 via-indigo-200 to-teal-200 bg-clip-text text-transparent">
-              Master Educators & Exam Rankers
+              Not the Brand.
             </span>
           </h1>
 
