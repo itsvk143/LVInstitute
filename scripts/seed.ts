@@ -168,16 +168,57 @@ async function seed() {
       ],
       isActive: true,
     },
-    { name: 'Mr. Vikash Kumar (CVK Sir)', email: 'itsvikash143@gmail.com', phone: '8457876843', qualification: 'Senior Chemistry Lecturer (10+ Yrs Exp, Ex-Aakash)', specialization: ['Chemistry', 'Physical Chemistry', 'Organic Chemistry', 'Inorganic Chemistry'] },
-    { name: 'Dr. Priya Sharma', email: 'priya@lvinstitute.com', phone: '9876543210', qualification: 'M.Sc, Ph.D Mathematics', specialization: ['Mathematics', 'Physics'] },
-    { name: 'Mr. Rahul Verma', email: 'rahul@lvinstitute.com', phone: '9876543211', qualification: 'M.Sc Chemistry', specialization: ['Chemistry', 'Biology'] },
-    { name: 'Ms. Anita Patel', email: 'anita@lvinstitute.com', phone: '9876543212', qualification: 'M.A English', specialization: ['English', 'Social Science'] },
-    { name: 'Mr. Suresh Kumar', email: 'suresh@lvinstitute.com', phone: '9876543213', qualification: 'M.Sc Physics', specialization: ['Physics', 'Mathematics'] },
+    {
+      name: 'Mr. Vikash Kumar (CVK Sir)',
+      email: 'itsvikash143@gmail.com',
+      phone: '8457876843',
+      website: 'www.cvksir.in',
+      qualification: 'Senior Chemistry Lecturer • M.Sc Chemistry (10+ Yrs Exp)',
+      experienceYears: '10+ Years',
+      bio: 'Senior Chemistry Educator with over 10 years of experience in mentoring students for National & State Level competitive exams like IIT-JEE (Mains & Advanced), NEET UG, CUET, CBSE/ICSE Boards, KVPY, and International Chemistry Olympiads (IChO). Guided numerous students from India and abroad to excel through strategic conceptual clarity, rapid reaction mechanisms, and result-oriented mentorship. Passionate about making Chemistry intuitive, visual, and scoring.',
+      achievements: [
+        'Top 50 AIR Rankers Produced in JEE Advanced & NEET UG',
+        'Ex-Faculty at Aakash Institute (Bhubaneswar & Haldwani)',
+        'Ex-Faculty at Narayana Institute & Resonance Edventures',
+        'Over 5,000+ Students Mentored with 98%+ Qualification Rate',
+        'Creator of 30-Second Physical Chemistry Calculation Shortcuts & Reaction Flowcharts',
+      ],
+      experienceTimeline: [
+        { role: 'Senior Chemistry Lecturer', organization: 'Aakash Institute, Bhubaneswar', period: 'June 2022 - Present' },
+        { role: 'Senior Chemistry Lecturer', organization: 'Narayana Institute', period: 'May 2021 - May 2022' },
+        { role: 'Chemistry Lecturer', organization: 'Aakash Institute, Haldwani', period: 'Feb 2019 - March 2020' },
+        { role: 'Chemistry Lecturer', organization: 'Resonance Edventures', period: 'June 2016 - Jan 2019' },
+      ],
+      subjectDomains: [
+        'Physical Chemistry',
+        'Organic Chemistry',
+        'Inorganic Chemistry',
+        'Reaction Mechanisms & Flowcharts',
+        'Coordination & Chemical Bonding',
+      ],
+      targetExams: [
+        'National & International Olympiads',
+        'Chemistry Olympiad (IChO & INChO)',
+        'Junior Science Olympiad (IJSO & NSEJS)',
+        'Pre-Olympiad Foundation (Class 8–10)',
+        'JEE Advanced (IIT)',
+        'JEE Mains',
+        'NEET UG (Medical)',
+        'CBSE & ICSE Boards (95%+)',
+        'KVPY & CUET',
+      ],
+      specialization: [
+        'Physical Chemistry',
+        'Organic Chemistry',
+        'Inorganic Chemistry',
+        'JEE Advanced',
+        'NEET UG',
+      ],
+      isActive: true,
+    },
   ]);
   const laxmi = teachers[0];
   const vikash = teachers[1];
-  const priya = teachers[2];
-  const rahul = teachers[3];
 
   // ── Subjects ─────────────────────────────────────────────────────────────────
   console.log('📖 Creating subjects...');
@@ -231,11 +272,11 @@ async function seed() {
   // ── Students ─────────────────────────────────────────────────────────────────
   console.log('🎓 Creating students...');
   const studentData = [
-    { admissionNumber: 'LV-2025-0001', name: 'Arjun Sharma', gender: 'male', parentName: 'Rajesh Sharma', parentContact: '9998887770', phone: '9998887771', school: dps._id, class: class10._id, section: 'A', board: cbse._id, country: india._id, batch: morningBatch._id, course: board._id, teacher: priya._id, joiningDate: new Date('2024-04-01') },
-    { admissionNumber: 'LV-2025-0002', name: 'Priya Nair', gender: 'female', parentName: 'Suresh Nair', parentContact: '9998887772', phone: '9998887773', school: dps._id, class: class10._id, section: 'A', board: cbse._id, country: india._id, batch: morningBatch._id, course: neet._id, teacher: rahul._id, joiningDate: new Date('2024-04-01') },
-    { admissionNumber: 'LV-2025-0003', name: 'Zara Ahmed', gender: 'female', parentName: 'Hassan Ahmed', parentContact: '9998887774', phone: '9998887775', school: gems._id, class: class10._id, section: 'B', board: cbse._id, country: uae._id, batch: intlBatch._id, course: board._id, teacher: priya._id, joiningDate: new Date('2024-06-01') },
-    { admissionNumber: 'LV-2025-0004', name: 'Rohit Patel', gender: 'male', parentName: 'Amit Patel', parentContact: '9998887776', school: dps._id, class: class10._id, section: 'B', board: icse._id, country: india._id, batch: morningBatch._id, course: neet._id, teacher: rahul._id, joiningDate: new Date('2024-04-10') },
-    { admissionNumber: 'LV-2025-0005', name: 'Fatima Al-Rashid', gender: 'female', parentName: 'Mohammed Al-Rashid', parentContact: '9998887778', school: gems._id, class: class10._id, section: 'A', board: cbse._id, country: uae._id, batch: intlBatch._id, course: board._id, teacher: priya._id, joiningDate: new Date('2024-07-01') },
+    { admissionNumber: 'LV-2025-0001', name: 'Arjun Sharma', gender: 'male', parentName: 'Rajesh Sharma', parentContact: '9998887770', phone: '9998887771', school: dps._id, class: class10._id, section: 'A', board: cbse._id, country: india._id, batch: morningBatch._id, course: board._id, teacher: vikash._id, joiningDate: new Date('2024-04-01') },
+    { admissionNumber: 'LV-2025-0002', name: 'Priya Nair', gender: 'female', parentName: 'Suresh Nair', parentContact: '9998887772', phone: '9998887773', school: dps._id, class: class10._id, section: 'A', board: cbse._id, country: india._id, batch: morningBatch._id, course: neet._id, teacher: laxmi._id, joiningDate: new Date('2024-04-01') },
+    { admissionNumber: 'LV-2025-0003', name: 'Zara Ahmed', gender: 'female', parentName: 'Hassan Ahmed', parentContact: '9998887774', phone: '9998887775', school: gems._id, class: class10._id, section: 'B', board: cbse._id, country: uae._id, batch: intlBatch._id, course: board._id, teacher: vikash._id, joiningDate: new Date('2024-06-01') },
+    { admissionNumber: 'LV-2025-0004', name: 'Rohit Patel', gender: 'male', parentName: 'Amit Patel', parentContact: '9998887776', school: dps._id, class: class10._id, section: 'B', board: icse._id, country: india._id, batch: morningBatch._id, course: neet._id, teacher: laxmi._id, joiningDate: new Date('2024-04-10') },
+    { admissionNumber: 'LV-2025-0005', name: 'Fatima Al-Rashid', gender: 'female', parentName: 'Mohammed Al-Rashid', parentContact: '9998887778', school: gems._id, class: class10._id, section: 'A', board: cbse._id, country: uae._id, batch: intlBatch._id, course: board._id, teacher: vikash._id, joiningDate: new Date('2024-07-01') },
   ];
   const students = await Student.insertMany(studentData);
   const [arjun, priyaStudent, zara] = students;
@@ -269,15 +310,15 @@ async function seed() {
   // ── Additional Topics for Arjun ───────────────────────────────────────────────
   console.log('✨ Creating additional topics...');
   await AdditionalTopic.insertMany([
-    { student: arjun._id, subject: math._id, name: 'Olympiad Algebra Problems', category: 'Olympiad Questions', dateTaught: d(50), teacher: priya._id, completionStatus: 'completed', revisionStatus: 'revised', teacherNotes: 'Excellent performance in level 2 problems' },
-    { student: arjun._id, subject: math._id, name: 'NCERT Exemplar - Quadratics', category: 'NCERT Exemplar', dateTaught: d(35), teacher: priya._id, completionStatus: 'completed', revisionStatus: 'pending' },
-    { student: arjun._id, subject: math._id, name: 'Previous Year Board Questions 2023', category: 'Previous Year Questions', dateTaught: d(20), teacher: priya._id, completionStatus: 'completed', revisionStatus: 'pending' },
-    { student: arjun._id, subject: math._id, name: 'HOTS - Mensuration', category: 'HOTS Questions', dateTaught: d(10), teacher: priya._id, completionStatus: 'in_progress', revisionStatus: 'not_applicable' },
-    { student: arjun._id, subject: physics._id, name: 'Advanced Numerical - Electricity', category: 'Advanced Numerical Problems', dateTaught: d(30), teacher: priya._id, completionStatus: 'completed', revisionStatus: 'revised' },
-    { student: arjun._id, subject: physics._id, name: 'Practical Applications - Light', category: 'Practical Applications', dateTaught: d(65), teacher: priya._id, completionStatus: 'completed', revisionStatus: 'revised' },
-    { student: arjun._id, subject: chemistry._id, name: 'Mental Ability - Chemical Equations', category: 'Mental Ability', dateTaught: d(45), teacher: rahul._id, completionStatus: 'completed', revisionStatus: 'pending' },
-    { student: arjun._id, subject: chemistry._id, name: 'Competitive Exam MCQs - Acids & Bases', category: 'Competitive Exam Topics', dateTaught: d(25), teacher: rahul._id, completionStatus: 'completed', revisionStatus: 'not_applicable' },
-    { student: arjun._id, subject: chemistry._id, name: 'Logical Reasoning - Periodic Table', category: 'Logical Reasoning', dateTaught: d(15), teacher: rahul._id, completionStatus: 'in_progress', revisionStatus: 'not_applicable' },
+    { student: arjun._id, subject: math._id, name: 'Olympiad Algebra Problems', category: 'Olympiad Questions', dateTaught: d(50), teacher: vikash._id, completionStatus: 'completed', revisionStatus: 'revised', teacherNotes: 'Excellent performance in level 2 problems' },
+    { student: arjun._id, subject: math._id, name: 'NCERT Exemplar - Quadratics', category: 'NCERT Exemplar', dateTaught: d(35), teacher: vikash._id, completionStatus: 'completed', revisionStatus: 'pending' },
+    { student: arjun._id, subject: math._id, name: 'Previous Year Board Questions 2023', category: 'Previous Year Questions', dateTaught: d(20), teacher: vikash._id, completionStatus: 'completed', revisionStatus: 'pending' },
+    { student: arjun._id, subject: math._id, name: 'HOTS - Mensuration', category: 'HOTS Questions', dateTaught: d(10), teacher: vikash._id, completionStatus: 'in_progress', revisionStatus: 'not_applicable' },
+    { student: arjun._id, subject: physics._id, name: 'Advanced Numerical - Electricity', category: 'Advanced Numerical Problems', dateTaught: d(30), teacher: vikash._id, completionStatus: 'completed', revisionStatus: 'revised' },
+    { student: arjun._id, subject: physics._id, name: 'Practical Applications - Light', category: 'Practical Applications', dateTaught: d(65), teacher: vikash._id, completionStatus: 'completed', revisionStatus: 'revised' },
+    { student: arjun._id, subject: chemistry._id, name: 'Mental Ability - Chemical Equations', category: 'Mental Ability', dateTaught: d(45), teacher: vikash._id, completionStatus: 'completed', revisionStatus: 'pending' },
+    { student: arjun._id, subject: chemistry._id, name: 'Competitive Exam MCQs - Acids & Bases', category: 'Competitive Exam Topics', dateTaught: d(25), teacher: vikash._id, completionStatus: 'completed', revisionStatus: 'not_applicable' },
+    { student: arjun._id, subject: chemistry._id, name: 'Logical Reasoning - Periodic Table', category: 'Logical Reasoning', dateTaught: d(15), teacher: vikash._id, completionStatus: 'in_progress', revisionStatus: 'not_applicable' },
   ]);
 
   // ── Marks for Arjun ──────────────────────────────────────────────────────────
