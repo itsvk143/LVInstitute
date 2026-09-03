@@ -19,6 +19,7 @@ import {
   Building2,
   Clock,
   Edit3,
+  Video,
   X,
   Save,
   ShieldCheck,
@@ -71,8 +72,9 @@ export default function TeacherProfilePage({
   // Booking Form State
   const [bookingName, setBookingName] = useState("");
   const [bookingPhone, setBookingPhone] = useState("");
+  const [bookingMode, setBookingMode] = useState<"online" | "offline">("online");
   const [bookingGrade, setBookingGrade] = useState("Class 11 (NEET / JEE)");
-  const [bookingSlot, setBookingSlot] = useState("Evening (5:00 PM - 7:00 PM)");
+  const [bookingSlot, setBookingSlot] = useState("Today (7:00 PM - 8:00 PM IST)");
 
   // Edit Form State
   const [editForm, setEditForm] = useState({
@@ -300,12 +302,14 @@ export default function TeacherProfilePage({
 
   const handleBookingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const modeText = bookingMode === "online" ? "Online Live Class" : "Offline Classroom / Center";
     toast.success(
-      `Demo session requested with ${teacher?.name}! Our academic counselor will call on ${bookingPhone} within 15 minutes.`
+      `🎉 Demo requested with ${teacher?.name} (${modeText}) for ${bookingSlot}! Our academic counselor will call ${bookingPhone} within 15 mins.`
     );
     setIsBookingOpen(false);
     setBookingName("");
     setBookingPhone("");
+    setBookingMode("online");
   };
 
   if (isLoading) {
@@ -751,19 +755,72 @@ export default function TeacherProfilePage({
                   </select>
                 </div>
 
+                {/* Mode: Online vs Offline */}
+                <div>
+                  <label className="text-[11px] font-bold text-slate-300 mb-1.5 block">
+                    Mode of Class
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setBookingMode("online")}
+                      className={cn(
+                        "flex items-center justify-center gap-2 py-2 px-3 rounded-xl border text-xs font-bold transition-all cursor-pointer",
+                        bookingMode === "online"
+                          ? "bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-600/30 ring-1 ring-white/20"
+                          : "bg-white/5 hover:bg-white/10 text-slate-300 border-white/15"
+                      )}
+                    >
+                      <Video className="w-3.5 h-3.5" />
+                      <span>Online Live</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setBookingMode("offline")}
+                      className={cn(
+                        "flex items-center justify-center gap-2 py-2 px-3 rounded-xl border text-xs font-bold transition-all cursor-pointer",
+                        bookingMode === "offline"
+                          ? "bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-600/30 ring-1 ring-white/20"
+                          : "bg-white/5 hover:bg-white/10 text-slate-300 border-white/15"
+                      )}
+                    >
+                      <Building2 className="w-3.5 h-3.5" />
+                      <span>Offline Center</span>
+                    </button>
+                  </div>
+                </div>
+
                 <div>
                   <label className="text-[11px] font-bold text-slate-300 mb-1 block">
-                    Preferred Slot
+                    Choose Demo Slot
                   </label>
-                  <select
-                    value={bookingSlot}
-                    onChange={(e) => setBookingSlot(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/20 text-xs text-white outline-none"
-                  >
-                    <option value="Evening (5:00 PM - 7:00 PM)">Evening (5:00 PM - 7:00 PM)</option>
-                    <option value="Morning (8:00 AM - 10:00 AM)">Morning (8:00 AM - 10:00 AM)</option>
-                    <option value="Weekend Special (Saturday 11:00 AM)">Weekend Special (Saturday 11:00 AM)</option>
-                  </select>
+                  <div className="relative">
+                    <select
+                      value={bookingSlot}
+                      onChange={(e) => setBookingSlot(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/20 text-xs text-white outline-none appearance-none cursor-pointer pr-8"
+                    >
+                      <optgroup label="⚡ Today's Available Slots" className="bg-slate-900 text-white">
+                        <option value="Today (5:00 PM - 6:00 PM IST)">Today (5:00 PM - 6:00 PM IST) • Evening Session</option>
+                        <option value="Today (7:00 PM - 8:00 PM IST)">Today (7:00 PM - 8:00 PM IST) • Prime Batch</option>
+                        <option value="Today (8:30 PM - 9:30 PM IST)">Today (8:30 PM - 9:30 PM IST) • Night Session</option>
+                      </optgroup>
+                      <optgroup label="📅 Tomorrow's Slots" className="bg-slate-900 text-white">
+                        <option value="Tomorrow (10:30 AM - 11:30 AM IST)">Tomorrow (10:30 AM - 11:30 AM IST) • Morning Session</option>
+                        <option value="Tomorrow (3:00 PM - 4:00 PM IST)">Tomorrow (3:00 PM - 4:00 PM IST) • Afternoon Session</option>
+                        <option value="Tomorrow (5:00 PM - 6:00 PM IST)">Tomorrow (5:00 PM - 6:00 PM IST) • Evening Session</option>
+                        <option value="Tomorrow (7:30 PM - 8:30 PM IST)">Tomorrow (7:30 PM - 8:30 PM IST) • Prime Time</option>
+                      </optgroup>
+                      <optgroup label="🎯 Weekend Masterclass" className="bg-slate-900 text-white">
+                        <option value="Saturday (11:00 AM - 12:00 PM IST)">Saturday (11:00 AM - 12:00 PM IST) • Weekend Special</option>
+                        <option value="Saturday (4:00 PM - 5:00 PM IST)">Saturday (4:00 PM - 5:00 PM IST) • Evening Masterclass</option>
+                        <option value="Sunday (11:00 AM - 12:00 PM IST)">Sunday (11:00 AM - 12:00 PM IST) • Sunday Foundation</option>
+                        <option value="Sunday (4:00 PM - 5:00 PM IST)">Sunday (4:00 PM - 5:00 PM IST) • Sunday Super Drill</option>
+                      </optgroup>
+                    </select>
+                    <Clock className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+                  </div>
                 </div>
 
                 <button
