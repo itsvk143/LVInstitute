@@ -484,6 +484,202 @@ const ADVANTAGES = [
   },
 ];
 
+interface CountryPhoneConfig {
+  id: string;
+  name: string;
+  dialCode: string;
+  flag: string;
+  digits: number;
+  placeholder: string;
+  format: (raw: string) => string;
+}
+
+const COUNTRY_CONFIGS: Record<string, CountryPhoneConfig> = {
+  "India (+91)": {
+    id: "IN",
+    name: "India",
+    dialCode: "+91",
+    flag: "🇮🇳",
+    digits: 10,
+    placeholder: "98765 43210",
+    format: (val) => {
+      const d = val.replace(/\D/g, "").slice(0, 10);
+      if (d.length <= 5) return d;
+      return `${d.slice(0, 5)} ${d.slice(5)}`;
+    },
+  },
+  "UAE (+971)": {
+    id: "AE",
+    name: "UAE",
+    dialCode: "+971",
+    flag: "🇦🇪",
+    digits: 9,
+    placeholder: "50 123 4567",
+    format: (val) => {
+      const d = val.replace(/\D/g, "").slice(0, 9);
+      if (d.length <= 2) return d;
+      if (d.length <= 5) return `${d.slice(0, 2)} ${d.slice(2)}`;
+      return `${d.slice(0, 2)} ${d.slice(2, 5)} ${d.slice(5)}`;
+    },
+  },
+  "USA (+1)": {
+    id: "US",
+    name: "United States",
+    dialCode: "+1",
+    flag: "🇺🇸",
+    digits: 10,
+    placeholder: "(555) 123-4567",
+    format: (val) => {
+      const d = val.replace(/\D/g, "").slice(0, 10);
+      if (d.length <= 3) return d;
+      if (d.length <= 6) return `(${d.slice(0, 3)}) ${d.slice(3)}`;
+      return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
+    },
+  },
+  "UK (+44)": {
+    id: "GB",
+    name: "United Kingdom",
+    dialCode: "+44",
+    flag: "🇬🇧",
+    digits: 10,
+    placeholder: "7911 123456",
+    format: (val) => {
+      const d = val.replace(/\D/g, "").slice(0, 10);
+      if (d.length <= 4) return d;
+      return `${d.slice(0, 4)} ${d.slice(4)}`;
+    },
+  },
+  "Singapore (+65)": {
+    id: "SG",
+    name: "Singapore",
+    dialCode: "+65",
+    flag: "🇸🇬",
+    digits: 8,
+    placeholder: "8123 4567",
+    format: (val) => {
+      const d = val.replace(/\D/g, "").slice(0, 8);
+      if (d.length <= 4) return d;
+      return `${d.slice(0, 4)} ${d.slice(4)}`;
+    },
+  },
+  "Canada (+1)": {
+    id: "CA",
+    name: "Canada",
+    dialCode: "+1",
+    flag: "🇨🇦",
+    digits: 10,
+    placeholder: "(555) 123-4567",
+    format: (val) => {
+      const d = val.replace(/\D/g, "").slice(0, 10);
+      if (d.length <= 3) return d;
+      if (d.length <= 6) return `(${d.slice(0, 3)}) ${d.slice(3)}`;
+      return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
+    },
+  },
+  "Australia (+61)": {
+    id: "AU",
+    name: "Australia",
+    dialCode: "+61",
+    flag: "🇦🇺",
+    digits: 9,
+    placeholder: "412 345 678",
+    format: (val) => {
+      const d = val.replace(/\D/g, "").slice(0, 9);
+      if (d.length <= 3) return d;
+      if (d.length <= 6) return `${d.slice(0, 3)} ${d.slice(3)}`;
+      return `${d.slice(0, 3)} ${d.slice(3, 6)} ${d.slice(6)}`;
+    },
+  },
+  "Qatar (+974)": {
+    id: "QA",
+    name: "Qatar",
+    dialCode: "+974",
+    flag: "🇶🇦",
+    digits: 8,
+    placeholder: "3312 3456",
+    format: (val) => {
+      const d = val.replace(/\D/g, "").slice(0, 8);
+      if (d.length <= 4) return d;
+      return `${d.slice(0, 4)} ${d.slice(4)}`;
+    },
+  },
+  "Saudi Arabia (+966)": {
+    id: "SA",
+    name: "Saudi Arabia",
+    dialCode: "+966",
+    flag: "🇸🇦",
+    digits: 9,
+    placeholder: "50 123 4567",
+    format: (val) => {
+      const d = val.replace(/\D/g, "").slice(0, 9);
+      if (d.length <= 2) return d;
+      if (d.length <= 5) return `${d.slice(0, 2)} ${d.slice(2)}`;
+      return `${d.slice(0, 2)} ${d.slice(2, 5)} ${d.slice(5)}`;
+    },
+  },
+  "Kuwait (+965)": {
+    id: "KW",
+    name: "Kuwait",
+    dialCode: "+965",
+    flag: "🇰🇼",
+    digits: 8,
+    placeholder: "9123 4567",
+    format: (val) => {
+      const d = val.replace(/\D/g, "").slice(0, 8);
+      if (d.length <= 4) return d;
+      return `${d.slice(0, 4)} ${d.slice(4)}`;
+    },
+  },
+  "Oman (+968)": {
+    id: "OM",
+    name: "Oman",
+    dialCode: "+968",
+    flag: "🇴🇲",
+    digits: 8,
+    placeholder: "9123 4567",
+    format: (val) => {
+      const d = val.replace(/\D/g, "").slice(0, 8);
+      if (d.length <= 4) return d;
+      return `${d.slice(0, 4)} ${d.slice(4)}`;
+    },
+  },
+  "Bahrain (+973)": {
+    id: "BH",
+    name: "Bahrain",
+    dialCode: "+973",
+    flag: "🇧🇭",
+    digits: 8,
+    placeholder: "3912 3456",
+    format: (val) => {
+      const d = val.replace(/\D/g, "").slice(0, 8);
+      if (d.length <= 4) return d;
+      return `${d.slice(0, 4)} ${d.slice(4)}`;
+    },
+  },
+  "Germany (+49)": {
+    id: "DE",
+    name: "Germany",
+    dialCode: "+49",
+    flag: "🇩🇪",
+    digits: 11,
+    placeholder: "151 12345678",
+    format: (val) => {
+      const d = val.replace(/\D/g, "").slice(0, 11);
+      if (d.length <= 3) return d;
+      return `${d.slice(0, 3)} ${d.slice(3)}`;
+    },
+  },
+  "Other (+Global)": {
+    id: "OTHER",
+    name: "International",
+    dialCode: "+",
+    flag: "🌐",
+    digits: 12,
+    placeholder: "1234567890",
+    format: (val) => val.replace(/[^\d\s-+]/g, "").slice(0, 16),
+  },
+};
+
 export default function HomePage() {
   const router = useRouter();
   const [newsletterEmail, setNewsletterEmail] = useState("");
@@ -503,6 +699,21 @@ export default function HomePage() {
   const [targetGoal, setTargetGoal] = useState("JEE (Main & Advanced)");
   const [email, setEmail] = useState("");
 
+  const currentCountryConfig = COUNTRY_CONFIGS[country] || COUNTRY_CONFIGS["India (+91)"];
+
+  const handleCountryChange = (newCountry: string) => {
+    setCountry(newCountry);
+    const cfg = COUNTRY_CONFIGS[newCountry] || COUNTRY_CONFIGS["India (+91)"];
+    if (parentPhone) {
+      setParentPhone(cfg.format(parentPhone));
+    }
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const cfg = currentCountryConfig;
+    setParentPhone(cfg.format(e.target.value));
+  };
+
   const handleOpenModal = (type?: string, examTitle?: string) => {
     setCountry("India (+91)");
     if (examTitle) {
@@ -513,11 +724,22 @@ export default function HomePage() {
 
   const handleDemoSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!studentName.trim() || !parentPhone.trim()) {
-      return toast.error("Please provide Student Name and Parent's Phone Number");
+    if (!studentName.trim()) {
+      return toast.error("Please provide Student's Full Name");
+    }
+    const rawDigits = parentPhone.replace(/\D/g, "");
+    if (!rawDigits) {
+      return toast.error("Please enter Parent's Phone Number");
+    }
+    if (currentCountryConfig.id !== "OTHER" && rawDigits.length < currentCountryConfig.digits) {
+      return toast.error(
+        `Please enter a valid ${currentCountryConfig.digits}-digit mobile number for ${currentCountryConfig.name} (${currentCountryConfig.dialCode})`
+      );
     }
     const modeLabel = learningMode === "online" ? "Online Live Interactive" : "Offline Classroom / Center";
-    toast.success(`🎉 Demo session booked for ${studentName} (${modeLabel}) on ${selectedDate} at ${selectedSlot}! WhatsApp invite sent to ${country} ${parentPhone}.`);
+    toast.success(
+      `🎉 Demo session booked for ${studentName} (${modeLabel}) on ${selectedDate} at ${selectedSlot}! WhatsApp invite sent to ${currentCountryConfig.dialCode} ${parentPhone}.`
+    );
     setModalOpen(false);
     setStudentName("");
     setParentPhone("");
@@ -1895,9 +2117,9 @@ export default function HomePage() {
                       <Globe className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                       <select
                         value={country}
-                        onChange={(e) => setCountry(e.target.value)}
+                        onChange={(e) => handleCountryChange(e.target.value)}
                         style={{ paddingLeft: "2.5rem" }}
-                        className="w-full py-2.5 pr-8 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white text-xs font-medium text-slate-900 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition-all outline-none appearance-none cursor-pointer"
+                        className="w-full py-2.5 pr-8 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white text-xs font-semibold text-slate-900 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition-all outline-none appearance-none cursor-pointer"
                       >
                         <option value="India (+91)">🇮🇳 India (+91)</option>
                         <option value="UAE (+971)">🇦🇪 UAE (+971)</option>
@@ -1923,19 +2145,26 @@ export default function HomePage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   {/* Parent Phone */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700 block">
-                      Parent's Phone (for WhatsApp link) <span className="text-indigo-600">*</span>
-                    </label>
-                    <div className="relative">
-                      <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold text-slate-700 block">
+                        Parent's Phone (WhatsApp) <span className="text-indigo-600">*</span>
+                      </label>
+                      <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100">
+                        {currentCountryConfig.digits} Digits
+                      </span>
+                    </div>
+                    <div className="flex rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus-within:bg-white focus-within:border-indigo-600 focus-within:ring-2 focus-within:ring-indigo-100 transition-all overflow-hidden">
+                      <div className="flex items-center gap-1 px-3 bg-slate-100/90 border-r border-slate-200 text-xs font-bold text-slate-800 select-none flex-shrink-0">
+                        <span>{currentCountryConfig.flag}</span>
+                        <span>{currentCountryConfig.dialCode}</span>
+                      </div>
                       <input
                         type="tel"
                         required
                         value={parentPhone}
-                        onChange={(e) => setParentPhone(e.target.value)}
-                        placeholder="+91 98765 43210"
-                        style={{ paddingLeft: "2.5rem" }}
-                        className="w-full py-2.5 pr-3 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white text-xs font-medium text-slate-900 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition-all outline-none"
+                        onChange={handlePhoneChange}
+                        placeholder={currentCountryConfig.placeholder}
+                        className="w-full py-2.5 px-3 bg-transparent text-xs font-semibold text-slate-900 outline-none placeholder:text-slate-400 tracking-wide"
                       />
                     </div>
                   </div>
