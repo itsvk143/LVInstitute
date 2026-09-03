@@ -19,6 +19,8 @@ import {
   Calendar,
   CheckCircle2,
   Users,
+  MapPin,
+  MessageCircle,
 } from "lucide-react";
 import axios from "axios";
 import { cn } from "@/lib/utils";
@@ -461,8 +463,33 @@ export default function PublicMentorsPage() {
       </section>
 
       {/* ── FOOTER ────────────────────────────────────────────────────────── */}
-      <footer className="bg-white border-t border-slate-200 py-8 text-center text-xs text-slate-500 font-medium">
-        <p>© 2026 LV Institute (Global Learning Vision). All rights reserved.</p>
+      <footer className="bg-slate-900 text-slate-400 border-t border-slate-800 py-10 text-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-1.5 text-center md:text-left">
+            <div className="flex items-center justify-center md:justify-start gap-2 text-white font-extrabold text-sm">
+              <MapPin className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+              <span>173, Prachi Enclave Rd, Prachi Enclave, District Center, Chandrasekharpur, Bhubaneswar, Odisha 751016</span>
+            </div>
+            <div className="flex items-center justify-center md:justify-start gap-4 text-xs font-semibold pt-1">
+              <a href="tel:+918457876843" className="text-emerald-400 hover:text-emerald-300 flex items-center gap-1">
+                <Phone className="w-3.5 h-3.5" />
+                <span>+91 8457876843 (Call & WhatsApp)</span>
+              </a>
+              <a
+                href="https://wa.me/918457876843?text=Hello%20LV%20Institute%2C%20I%20want%20to%20inquire%20about%20faculty%20mentors."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white bg-emerald-600 hover:bg-emerald-500 px-2.5 py-1 rounded-lg font-bold flex items-center gap-1 transition-all"
+              >
+                <MessageCircle className="w-3.5 h-3.5" />
+                <span>WhatsApp</span>
+              </a>
+            </div>
+          </div>
+          <p className="text-slate-500 text-center md:text-right">
+            © 2026 LV Institute. All rights reserved.
+          </p>
+        </div>
       </footer>
     </div>
   );

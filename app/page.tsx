@@ -52,7 +52,8 @@ import {
   X,
   Target,
   TrendingUp,
-  Landmark
+  Landmark,
+  MessageCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -1990,20 +1991,46 @@ export default function HomePage() {
                 CONTACT & SUPPORT
               </p>
 
-              <div className="space-y-2.5">
+              <div className="space-y-3">
                 <div className="flex items-start gap-2.5">
                   <MapPin className="w-4 h-4 text-indigo-400 flex-shrink-0 mt-0.5" />
-                  <span>Knowledge Park Campus, New Delhi, India 110001</span>
+                  <span className="leading-relaxed text-slate-300">
+                    173, Prachi Enclave Rd, Prachi Enclave, District Center, Chandrasekharpur, Bhubaneswar, Odisha 751016
+                  </span>
                 </div>
 
                 <div className="flex items-start gap-2.5">
-                  <Phone className="w-4 h-4 text-indigo-400 flex-shrink-0 mt-0.5" />
-                  <span>+91 (011) 4567-8900 / +91 98765-43210</span>
+                  <Phone className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <a
+                      href="tel:+918457876843"
+                      className="text-slate-100 hover:text-emerald-400 font-bold transition-colors block text-sm"
+                    >
+                      +91 8457876843
+                    </a>
+                    <span className="text-[11px] text-emerald-400/90 font-semibold block">
+                      Indian Contact • Call & WhatsApp
+                    </span>
+                  </div>
                 </div>
 
-                <div className="flex items-start gap-2.5">
+                <div>
+                  <a
+                    href="https://wa.me/918457876843?text=Hello%20LV%20Institute%2C%20I%20want%20to%20inquire%20about%20admissions%20and%20programs."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-md shadow-emerald-950/50"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5" />
+                    <span>WhatsApp Us Directly</span>
+                  </a>
+                </div>
+
+                <div className="flex items-start gap-2.5 pt-1">
                   <Mail className="w-4 h-4 text-indigo-400 flex-shrink-0 mt-0.5" />
-                  <span>admissions@lvinstitute.com</span>
+                  <a href="mailto:admissions@lvinstitute.com" className="hover:text-white transition-colors">
+                    admissions@lvinstitute.com
+                  </a>
                 </div>
               </div>
 
