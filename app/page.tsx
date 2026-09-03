@@ -2009,7 +2009,7 @@ export default function HomePage() {
                       +91 8457876843
                     </a>
                     <span className="text-[11px] text-emerald-400/90 font-semibold block">
-                      Indian Contact • Call & WhatsApp
+                      Call & WhatsApp
                     </span>
                   </div>
                 </div>
