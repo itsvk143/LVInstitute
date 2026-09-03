@@ -602,14 +602,6 @@ export default function HomePage() {
               <span>Login</span>
             </Link>
 
-            {/* Register */}
-            <Link
-              href="/student/LV-2025-0001"
-              className="hidden sm:inline-flex items-center px-4 py-2 rounded-xl border border-indigo-200 bg-indigo-50/70 hover:bg-indigo-100/80 text-indigo-700 text-sm font-bold transition-all shadow-2xs"
-            >
-              <span>Register</span>
-            </Link>
-
             {/* Get Started */}
             <button
               type="button"
