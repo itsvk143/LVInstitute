@@ -74,7 +74,11 @@ export default function TeacherProfilePage({
   const [bookingPhone, setBookingPhone] = useState("");
   const [bookingMode, setBookingMode] = useState<"online" | "offline">("online");
   const [bookingGrade, setBookingGrade] = useState("Class 11 (NEET / JEE)");
-  const [bookingSlot, setBookingSlot] = useState("Today (7:00 PM - 8:00 PM IST)");
+  const [bookingDate, setBookingDate] = useState(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  });
+  const [bookingSlot, setBookingSlot] = useState("07:00 PM - 08:00 PM");
 
   // Edit Form State
   const [editForm, setEditForm] = useState({
@@ -304,7 +308,7 @@ export default function TeacherProfilePage({
     e.preventDefault();
     const modeText = bookingMode === "online" ? "Online Live Class" : "Offline Classroom / Center";
     toast.success(
-      `🎉 Demo requested with ${teacher?.name} (${modeText}) for ${bookingSlot}! Our academic counselor will call ${bookingPhone} within 15 mins.`
+      `🎉 Demo requested with ${teacher?.name} (${modeText}) on ${bookingDate} at ${bookingSlot}! Counselor will call ${bookingPhone} within 15 mins.`
     );
     setIsBookingOpen(false);
     setBookingName("");
@@ -791,35 +795,43 @@ export default function TeacherProfilePage({
                   </div>
                 </div>
 
-                <div>
-                  <label className="text-[11px] font-bold text-slate-300 mb-1 block">
-                    Choose Demo Slot
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={bookingSlot}
-                      onChange={(e) => setBookingSlot(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/20 text-xs text-white outline-none appearance-none cursor-pointer pr-8"
-                    >
-                      <optgroup label="⚡ Today's Available Slots" className="bg-slate-900 text-white">
-                        <option value="Today (5:00 PM - 6:00 PM IST)">Today (5:00 PM - 6:00 PM IST) • Evening Session</option>
-                        <option value="Today (7:00 PM - 8:00 PM IST)">Today (7:00 PM - 8:00 PM IST) • Prime Batch</option>
-                        <option value="Today (8:30 PM - 9:30 PM IST)">Today (8:30 PM - 9:30 PM IST) • Night Session</option>
-                      </optgroup>
-                      <optgroup label="📅 Tomorrow's Slots" className="bg-slate-900 text-white">
-                        <option value="Tomorrow (10:30 AM - 11:30 AM IST)">Tomorrow (10:30 AM - 11:30 AM IST) • Morning Session</option>
-                        <option value="Tomorrow (3:00 PM - 4:00 PM IST)">Tomorrow (3:00 PM - 4:00 PM IST) • Afternoon Session</option>
-                        <option value="Tomorrow (5:00 PM - 6:00 PM IST)">Tomorrow (5:00 PM - 6:00 PM IST) • Evening Session</option>
-                        <option value="Tomorrow (7:30 PM - 8:30 PM IST)">Tomorrow (7:30 PM - 8:30 PM IST) • Prime Time</option>
-                      </optgroup>
-                      <optgroup label="🎯 Weekend Masterclass" className="bg-slate-900 text-white">
-                        <option value="Saturday (11:00 AM - 12:00 PM IST)">Saturday (11:00 AM - 12:00 PM IST) • Weekend Special</option>
-                        <option value="Saturday (4:00 PM - 5:00 PM IST)">Saturday (4:00 PM - 5:00 PM IST) • Evening Masterclass</option>
-                        <option value="Sunday (11:00 AM - 12:00 PM IST)">Sunday (11:00 AM - 12:00 PM IST) • Sunday Foundation</option>
-                        <option value="Sunday (4:00 PM - 5:00 PM IST)">Sunday (4:00 PM - 5:00 PM IST) • Sunday Super Drill</option>
-                      </optgroup>
-                    </select>
-                    <Clock className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+                {/* Select Date & Select Slot */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-300 mb-1 block">
+                      Select Date <span className="text-indigo-400">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="date"
+                        value={bookingDate}
+                        min={new Date().toISOString().split("T")[0]}
+                        onChange={(e) => setBookingDate(e.target.value)}
+                        className="w-full px-2.5 py-2 rounded-xl bg-slate-900 border border-white/20 text-xs text-white outline-none cursor-pointer"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-300 mb-1 block">
+                      Select Slot <span className="text-indigo-400">*</span>
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={bookingSlot}
+                        onChange={(e) => setBookingSlot(e.target.value)}
+                        className="w-full px-2.5 py-2 rounded-xl bg-slate-900 border border-white/20 text-xs text-white outline-none appearance-none cursor-pointer pr-7"
+                      >
+                        <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM (Morning)</option>
+                        <option value="11:30 AM - 12:30 PM">11:30 AM - 12:30 PM (Mid-Day)</option>
+                        <option value="03:00 PM - 04:00 PM">03:00 PM - 04:00 PM (Afternoon)</option>
+                        <option value="05:00 PM - 06:00 PM">05:00 PM - 06:00 PM (Evening)</option>
+                        <option value="07:00 PM - 08:00 PM">07:00 PM - 08:00 PM (Prime Time)</option>
+                        <option value="08:30 PM - 09:30 PM">08:30 PM - 09:30 PM (Night Batch)</option>
+                      </select>
+                      <Clock className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none" />
+                    </div>
                   </div>
                 </div>
 

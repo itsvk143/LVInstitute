@@ -490,7 +490,11 @@ export default function HomePage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [country, setCountry] = useState("India (+91)");
   const [learningMode, setLearningMode] = useState<"online" | "offline">("online");
-  const [selectedSlot, setSelectedSlot] = useState("Today (7:00 PM - 8:00 PM IST)");
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  });
+  const [selectedSlot, setSelectedSlot] = useState("07:00 PM - 08:00 PM");
   const [olympiadFilter, setOlympiadFilter] = useState<"all" | "math" | "physics" | "science" | "bio-chem" | "cyber">("all");
   const [neetBoardFilter, setNeetBoardFilter] = useState<"all" | "neet" | "class12" | "class10" | "foundation">("all");
   const [studentName, setStudentName] = useState("");
@@ -513,7 +517,7 @@ export default function HomePage() {
       return toast.error("Please provide Student Name and Parent's Phone Number");
     }
     const modeLabel = learningMode === "online" ? "Online Live Interactive" : "Offline Classroom / Center";
-    toast.success(`🎉 Demo session booked for ${studentName} (${modeLabel}) on ${selectedSlot}! WhatsApp invite sent to ${country} ${parentPhone}.`);
+    toast.success(`🎉 Demo session booked for ${studentName} (${modeLabel}) on ${selectedDate} at ${selectedSlot}! WhatsApp invite sent to ${country} ${parentPhone}.`);
     setModalOpen(false);
     setStudentName("");
     setParentPhone("");
@@ -2065,43 +2069,59 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Row 5: Choose Slot from Dropdown */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-slate-700 block">
-                      Choose Demo Slot <span className="text-indigo-600">*</span>
-                    </label>
-                    <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200">
-                      Flexible Timings
-                    </span>
+                {/* Row 5: Select Date, Then Select Slot */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  {/* Select Date */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold text-slate-700 block">
+                        Select Date <span className="text-indigo-600">*</span>
+                      </label>
+                      <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200">
+                        Step 1
+                      </span>
+                    </div>
+                    <div className="relative">
+                      <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-600 pointer-events-none" />
+                      <input
+                        type="date"
+                        value={selectedDate}
+                        min={new Date().toISOString().split("T")[0]}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                        style={{ paddingLeft: "2.5rem" }}
+                        className="w-full py-2.5 pr-3 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white text-xs font-semibold text-slate-900 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition-all outline-none cursor-pointer"
+                        required
+                      />
+                    </div>
                   </div>
-                  <div className="relative">
-                    <Clock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-600 pointer-events-none" />
-                    <select
-                      value={selectedSlot}
-                      onChange={(e) => setSelectedSlot(e.target.value)}
-                      style={{ paddingLeft: "2.5rem" }}
-                      className="w-full py-2.5 pr-9 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white text-xs font-semibold text-slate-900 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition-all outline-none appearance-none cursor-pointer"
-                    >
-                      <optgroup label="⚡ Today's Available Slots">
-                        <option value="Today (5:00 PM - 6:00 PM IST)">Today (5:00 PM - 6:00 PM IST) • Evening Session</option>
-                        <option value="Today (7:00 PM - 8:00 PM IST)">Today (7:00 PM - 8:00 PM IST) • Prime Batch</option>
-                        <option value="Today (8:30 PM - 9:30 PM IST)">Today (8:30 PM - 9:30 PM IST) • Night Session</option>
-                      </optgroup>
-                      <optgroup label="📅 Tomorrow's Slots">
-                        <option value="Tomorrow (10:30 AM - 11:30 AM IST)">Tomorrow (10:30 AM - 11:30 AM IST) • Morning Session</option>
-                        <option value="Tomorrow (3:00 PM - 4:00 PM IST)">Tomorrow (3:00 PM - 4:00 PM IST) • Afternoon Session</option>
-                        <option value="Tomorrow (5:00 PM - 6:00 PM IST)">Tomorrow (5:00 PM - 6:00 PM IST) • Evening Session</option>
-                        <option value="Tomorrow (7:30 PM - 8:30 PM IST)">Tomorrow (7:30 PM - 8:30 PM IST) • Prime Time</option>
-                      </optgroup>
-                      <optgroup label="🎯 Weekend Masterclass">
-                        <option value="Saturday (11:00 AM - 12:00 PM IST)">Saturday (11:00 AM - 12:00 PM IST) • Weekend Special</option>
-                        <option value="Saturday (4:00 PM - 5:00 PM IST)">Saturday (4:00 PM - 5:00 PM IST) • Evening Masterclass</option>
-                        <option value="Sunday (11:00 AM - 12:00 PM IST)">Sunday (11:00 AM - 12:00 PM IST) • Sunday Foundation</option>
-                        <option value="Sunday (4:00 PM - 5:00 PM IST)">Sunday (4:00 PM - 5:00 PM IST) • Sunday Super Drill</option>
-                      </optgroup>
-                    </select>
-                    <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+
+                  {/* Select Slot */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold text-slate-700 block">
+                        Select Slot <span className="text-indigo-600">*</span>
+                      </label>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                        Step 2
+                      </span>
+                    </div>
+                    <div className="relative">
+                      <Clock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-600 pointer-events-none" />
+                      <select
+                        value={selectedSlot}
+                        onChange={(e) => setSelectedSlot(e.target.value)}
+                        style={{ paddingLeft: "2.5rem" }}
+                        className="w-full py-2.5 pr-9 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white text-xs font-semibold text-slate-900 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition-all outline-none appearance-none cursor-pointer"
+                      >
+                        <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM (Morning)</option>
+                        <option value="11:30 AM - 12:30 PM">11:30 AM - 12:30 PM (Mid-Day)</option>
+                        <option value="03:00 PM - 04:00 PM">03:00 PM - 04:00 PM (Afternoon)</option>
+                        <option value="05:00 PM - 06:00 PM">05:00 PM - 06:00 PM (Evening)</option>
+                        <option value="07:00 PM - 08:00 PM">07:00 PM - 08:00 PM (Prime Time)</option>
+                        <option value="08:30 PM - 09:30 PM">08:30 PM - 09:30 PM (Night Batch)</option>
+                      </select>
+                      <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                    </div>
                   </div>
                 </div>
 
