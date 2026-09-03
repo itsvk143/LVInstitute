@@ -373,7 +373,7 @@ const GLOBAL_EXAMS_DATA = [
     region: "USA / Global",
     title: "TOEFL iBT",
     sub: "Language Proficiency",
-    desc: "Interactive AI-driven accent and vocabulary analysis for maximum scores on reading, listening, speaking, and writing.",
+    desc: "Interactive accent and vocabulary analysis for maximum scores on reading, listening, speaking, and writing.",
     target: "110+ Target",
     active: true,
   },
@@ -451,7 +451,7 @@ const ADVANTAGES = [
   {
     icon: Activity,
     iconBg: "bg-indigo-100 text-indigo-600",
-    title: "AI-Powered Performance Analytics",
+    title: "Advanced Performance Analytics",
     desc: "Instant question-level error mapping, retention alerts, and predicted All-India ranks after every mock test.",
     highlighted: false,
   },
@@ -1026,7 +1026,7 @@ export default function HomePage() {
                 </div>
                 <div className="flex items-center gap-1.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>1-on-1 AI Doubt Desk</span>
+                  <span>1-on-1 Doubt Desk</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600" />
@@ -1702,7 +1702,7 @@ export default function HomePage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-xs font-extrabold text-slate-900">
                     <Activity className="w-4 h-4 text-indigo-600" />
-                    <span>Live AI Topic Mastery Index</span>
+                    <span>Live Topic Mastery Index</span>
                   </div>
                   <span className="text-xs font-extrabold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                     94% Mastery
@@ -1928,7 +1928,7 @@ export default function HomePage() {
               </div>
 
               <p className="text-slate-400 leading-relaxed text-xs">
-                Pioneering excellence in STEM, Board Exams, and International curriculum through personalized AI diagnostics, IIT/PhD mentors, and transformative pedagogy.
+                Pioneering excellence in STEM, Board Exams, and International curriculum through personalized diagnostic analytics, IIT/PhD mentors, and transformative pedagogy.
               </p>
 
               {/* Newsletter Subscribe */}
@@ -2107,7 +2107,7 @@ export default function HomePage() {
                 </h3>
 
                 <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                  Experience our interactive classroom, diagnostic AI analytics, and personalized guidance from IIT/PhD mentors.
+                  Experience our interactive classroom, diagnostic performance analytics, and personalized guidance from IIT/PhD mentors.
                 </p>
               </div>
 
